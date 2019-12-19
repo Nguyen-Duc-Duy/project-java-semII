@@ -175,7 +175,7 @@ public class login extends javax.swing.JFrame {
         jbox_login.add(jPanel4);
         jPanel4.setBounds(10, 80, 270, 30);
         jbox_login.add(jPanel5);
-        jPanel5.setBounds(20, 90, 100, 100);
+        jPanel5.setBounds(20, 90, 10, 10);
 
         jPanel6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
