@@ -16,8 +16,7 @@ public class Manager extends javax.swing.JFrame {
      */
     public Manager() {
         initComponents();
-        jProduct.setOpaque(false);
-//        jProduct.setBackground(new Color(0,0,0,0));
+        setLocationRelativeTo(null);
     }
 
     /**
