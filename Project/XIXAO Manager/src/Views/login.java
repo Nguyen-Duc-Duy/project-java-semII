@@ -20,7 +20,7 @@ public class login extends javax.swing.JFrame {
      */
     public login() {
         initComponents();
-        setIconImage(new ImageIcon(login.class.getResource("/Commons/img/icon-logo-X-green16.png")).getImage());
+        PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
     }
 
