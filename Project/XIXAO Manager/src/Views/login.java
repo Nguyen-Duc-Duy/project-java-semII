@@ -7,6 +7,7 @@ package Views;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -189,6 +190,11 @@ public class login extends javax.swing.JFrame {
 
         jButtonCancel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonCancel.setText("Hủy");
+        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -241,6 +247,11 @@ public class login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBoxRememberAccActionPerformed
 
+    private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
+        System.out.println("ok");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }//GEN-LAST:event_jButtonCancelActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -252,7 +263,7 @@ public class login extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Windown".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
