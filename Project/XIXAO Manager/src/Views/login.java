@@ -5,7 +5,8 @@
  */
 package Views;
 
-import java.awt.Image;
+import Commons.ConnectData;
+import java.sql.Connection;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -19,10 +20,15 @@ public class login extends javax.swing.JFrame {
     /**
      * Creates new form login
      */
+    Connection connect;
+    ConnectData c = new ConnectData();
+    
     public login() {
         initComponents();
         setIconImage(new ImageIcon(login.class.getResource("/Commons/img/icon-logo-X-green16.png")).getImage());
         setLocationRelativeTo(null);
+        connect = c.ConnectData();
+        Controllers.login login = new Controllers.login(connect);
     }
 
     /**
@@ -233,12 +239,17 @@ public class login extends javax.swing.JFrame {
     }//GEN-LAST:event_jpasswordActionPerformed
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
+        Controllers.login login = new Controllers.login(connect);
+        Manager m;
+        m = new Manager();
+        m.setVisible(true);
         String email = jEmail.getText();
         String pass = jpassword.getText();
-        if(jCheckBoxRememberAcc.isSelected()){
+        login.checkLogin(email, pass);
+        if (jCheckBoxRememberAcc.isSelected()) {
             JOptionPane.showMessageDialog(rootPane, "Tài khoản hoặc mật khẩu không tồn tại !");
         }
-        if(email == "" && pass == ""){
+        if (email == "" && pass == "") {
             
         }
     }//GEN-LAST:event_jButtonLoginActionPerformed
