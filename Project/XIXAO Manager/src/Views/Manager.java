@@ -26,6 +26,7 @@ public class Manager extends javax.swing.JFrame {
         PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
         connect.ConnectData();
+        jProduct.setVisible(false);
     }
 
     /**
@@ -239,6 +240,11 @@ public class Manager extends javax.swing.JFrame {
         jRepository.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 jRepositoryMouseMoved(evt);
+            }
+        });
+        jRepository.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jRepositoryMouseClicked(evt);
             }
         });
 
@@ -459,6 +465,10 @@ public class Manager extends javax.swing.JFrame {
     private void jFeedbackMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFeedbackMouseMoved
         jFeedback.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jFeedbackMouseMoved
+
+    private void jRepositoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseClicked
+        jProduct.setVisible(true);
+    }//GEN-LAST:event_jRepositoryMouseClicked
 
     /**
      * @param args the command line arguments
