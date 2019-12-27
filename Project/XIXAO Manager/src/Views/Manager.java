@@ -5,7 +5,9 @@
  */
 package Views;
 
+import Commons.ConnectData;
 import java.awt.Cursor;
+import java.sql.Connection;
 
 /**
  *
@@ -16,10 +18,14 @@ public class Manager extends javax.swing.JFrame {
     /**
      * Creates new form Manager
      */
+    ConnectData connect = new ConnectData();
+    Connection c;
+    
     public Manager() {
         initComponents();
         PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
+        connect.ConnectData();
     }
 
     /**

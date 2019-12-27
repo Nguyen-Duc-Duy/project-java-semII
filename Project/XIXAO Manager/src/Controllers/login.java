@@ -13,9 +13,11 @@ import java.sql.Connection;
  */
 public class login {
     Connection c;
-
+//hàm khởi tạo
     public login(Connection c) {
         this.c = c;
     }
-    
+//phương thức kiểm tra thôgn tin tài khoản
+    public void checkLogin(String email, String pass){
+    }
 }

@@ -12,7 +12,6 @@ CREATE TABLE employers
 	avt NVARCHAR(265) NULL DEFAULT 'avt_user.png',
 	phone VARCHAR(10) NULL,
 	[status] TINYINT DEFAULT 1,
-	powerfull TINYINT NOT NULL,
 	date_created DATETIME,
 	date_updated DATETIME
 )
@@ -88,4 +87,10 @@ GO
 ALTER TABLE products
 ADD FOREIGN KEY (id_unit) REFERENCES units(id)
 SELECT * FROM units
+
+ALTER TABLE employers 
+ DROP COLUMN powerfull;
+-- thêm quyền admin tổng
+insert into employers(name,email,pass) values (N'Nguyễn Đức Duy','duy@gmail.com','1')
+
 
