@@ -6,6 +6,7 @@
 package Views;
 
 import Commons.ConnectData;
+import Controllers.DAO.Account;
 import java.sql.Connection;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -15,20 +16,24 @@ import javax.swing.JOptionPane;
  *
  * @author NGUYEN DUC DUY
  */
-public class login extends javax.swing.JFrame {
+public class login extends javax.swing.JFrame{
 
     /**
-     * Creates new form login
+     * Creates new form Account
      */
     Connection connect;
     ConnectData c = new ConnectData();
-    
+    Account acc;
+
     public login() {
         initComponents();
         setIconImage(new ImageIcon(login.class.getResource("/Commons/img/icon-logo-X-green16.png")).getImage());
         setLocationRelativeTo(null);
+//      gán giá trị cho biến để kêt nối csdl
         connect = c.ConnectData();
-        Controllers.login login = new Controllers.login(connect);
+//      khởi tạo lớp tài khoản
+        acc = new Account(connect);
+
     }
 
     /**
@@ -58,6 +63,7 @@ public class login extends javax.swing.JFrame {
         jPanel6 = new javax.swing.JPanel();
         jButtonLogin = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
+        jErrorLogin = new javax.swing.JLabel();
 
         jRadioButton1.setText("jRadioButton1");
 
@@ -86,7 +92,7 @@ public class login extends javax.swing.JFrame {
         jPanel1.add(jLabel3);
         jLabel3.setBounds(0, 110, 190, 30);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 190, 170));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 190, 150));
 
         jbox_login.setLayout(null);
 
@@ -156,7 +162,7 @@ public class login extends javax.swing.JFrame {
         jbox_login.add(jPanel3);
         jPanel3.setBounds(10, 40, 270, 40);
 
-        jCheckBoxRememberAcc.setText("Nhớ tài khỏa của tôi.");
+        jCheckBoxRememberAcc.setText("Nhớ tài khoản của tôi.");
         jCheckBoxRememberAcc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxRememberAccActionPerformed(evt);
@@ -225,7 +231,11 @@ public class login extends javax.swing.JFrame {
         jbox_login.add(jPanel6);
         jPanel6.setBounds(10, 120, 270, 30);
 
-        getContentPane().add(jbox_login, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 130, 290, 170));
+        getContentPane().add(jbox_login, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 130, 290, 150));
+
+        jErrorLogin.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jErrorLogin.setForeground(new java.awt.Color(255, 51, 51));
+        getContentPane().add(jErrorLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 490, 20));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -239,19 +249,22 @@ public class login extends javax.swing.JFrame {
     }//GEN-LAST:event_jpasswordActionPerformed
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        Controllers.login login = new Controllers.login(connect);
-        Manager m;
-        m = new Manager();
-        m.setVisible(true);
         String email = jEmail.getText();
         String pass = jpassword.getText();
-        login.checkLogin(email, pass);
-        if (jCheckBoxRememberAcc.isSelected()) {
-            JOptionPane.showMessageDialog(rootPane, "Tài khoản hoặc mật khẩu không tồn tại !");
+//      kiểm tra tính hợp lệ của email
+        Emtitys.Employers e = acc.login(email, pass);
+        if (acc.rgEmail(email)) {
+            if (e != null) {
+                JFrame jManager = new Manager();
+                jManager.setVisible(true);
+                this.setVisible(false);
+            }else{
+                jErrorLogin.setText("Tài khoản hoặc mật khẩu không hợp lệ, xin thử lại !");
+            };
+        }else{
+            jErrorLogin.setText("Email đúng định dạng, xin nhập lại !");
         }
-        if (email == "" && pass == "") {
-            
-        }
+
     }//GEN-LAST:event_jButtonLoginActionPerformed
 
     private void jCheckBoxRememberAccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxRememberAccActionPerformed
@@ -259,8 +272,7 @@ public class login extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBoxRememberAccActionPerformed
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        System.out.println("ok");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(false);
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     /**
@@ -303,6 +315,7 @@ public class login extends javax.swing.JFrame {
     private javax.swing.JButton jButtonLogin;
     private javax.swing.JCheckBox jCheckBoxRememberAcc;
     private javax.swing.JTextField jEmail;
+    private javax.swing.JLabel jErrorLogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

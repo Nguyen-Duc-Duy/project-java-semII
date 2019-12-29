@@ -13,7 +13,7 @@ import java.sql.Connection;
  *
  * @author NGUYEN DUC DUY
  */
-public class Manager extends javax.swing.JFrame {
+public class Manager extends javax.swing.JFrame{
 
     /**
      * Creates new form Manager
@@ -26,9 +26,12 @@ public class Manager extends javax.swing.JFrame {
         PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
         connect.ConnectData();
-        jProduct.setVisible(false);
     }
-
+//  phương thức nhận tài khoản khi đăng nhập
+    Employers em;
+    public void inforAcc(Employers e){
+        this.em = e;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
