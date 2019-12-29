@@ -195,3 +195,11 @@ CREATE TABLE comments
 	date_created DATETIME,
 	date_updated DATETIME
 )
+---29/12/2019
+-- tạo thủ tục kiẻm tra emai login
+CREATE PROC checkEmail
+@email VARCHAR(265)
+AS SELECT * FROM employers WHERE email like @email
+
+-- thêm danh sách quyền
+SELECT * FROM products

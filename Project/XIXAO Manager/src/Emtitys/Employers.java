@@ -18,11 +18,12 @@ public class Employers {
     String avt;
     String phone;
     int status;
+    int id_couter;
     String date_created;
     String date_updated;
 //Hàm khởi tạo
     //  có id
-    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated) {
+    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated,int id_couter) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -32,9 +33,10 @@ public class Employers {
         this.status = status;
         this.date_created = date_created;
         this.date_updated = date_updated;
+        this.id_couter = id_couter;
     }
     //  không có id
-    public Employers(String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated) {
+    public Employers(String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated,int id_couter) {
         this.name = name;
         this.email = email;
         this.pass = pass;
@@ -43,12 +45,21 @@ public class Employers {
         this.status = status;
         this.date_created = date_created;
         this.date_updated = date_updated;
+        this.id_couter = id_couter;
     }
     //  không có tham số
     public Employers() {
     }
 //Phương thức set & get
 
+    public int getId_couter() {
+        return id_couter;
+    }
+
+    public void setId_couter(int id_couter) {
+        this.id_couter = id_couter;
+    }
+    
     public int getId() {
         return id;
     }
