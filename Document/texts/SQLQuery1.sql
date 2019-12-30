@@ -15,6 +15,7 @@ CREATE TABLE employers
 	date_created DATETIME,
 	date_updated DATETIME
 )
+
 SELECT * FROM employers
 
 -- bảng phân quyền
