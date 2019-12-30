@@ -27,13 +27,13 @@ import javax.swing.JOptionPane;
 public class Account implements IAccount {
 
     Connection connect;
+    
 //hàm khởi tạo
-
     public Account(Connection c) {
         this.connect = c;
     }
+    
 //  lấy toàn bộ tài khoản
-
     @Override
     public List<Employers> getAll() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
