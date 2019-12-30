@@ -255,7 +255,7 @@ public class login extends javax.swing.JFrame{
         Emtitys.Employers e = acc.login(email, pass);
         if (acc.rgEmail(email)) {
             if (e != null) {
-                JFrame jManager = new Manager();
+                Manager jManager = new Manager(e);
                 jManager.setVisible(true);
                 this.setVisible(false);
             }else{

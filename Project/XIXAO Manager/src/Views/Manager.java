@@ -13,25 +13,31 @@ import java.sql.Connection;
  *
  * @author NGUYEN DUC DUY
  */
-public class Manager extends javax.swing.JFrame{
+public class Manager extends javax.swing.JFrame {
 
     /**
      * Creates new form Manager
      */
     ConnectData connect = new ConnectData();
     Connection c;
-    
-    public Manager() {
+    Emtitys.Employers em;
+
+    public Manager(Emtitys.Employers e) {
         initComponents();
+// nhận tài khoản khi đăng nhập
+        this.em = e;
         PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
         connect.ConnectData();
+        showAcc();
+
     }
-//  phương thức nhận tài khoản khi đăng nhập
-    Employers em;
-    public void inforAcc(Employers e){
-        this.em = e;
+// phương thức hiển thị thông tin tài khoản
+
+    private void showAcc() {
+        jAccName.setText(em.getName());
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -48,7 +54,7 @@ public class Manager extends javax.swing.JFrame{
         jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        jAccName = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jBoxController = new javax.swing.JPanel();
@@ -120,10 +126,10 @@ public class Manager extends javax.swing.JFrame{
 
         jPanel3.setBackground(new java.awt.Color(0, 102, 0));
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel4.setText("Nguyễn Duy");
+        jAccName.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jAccName.setForeground(new java.awt.Color(255, 255, 255));
+        jAccName.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jAccName.setText("Nguyễn Duy");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -131,13 +137,13 @@ public class Manager extends javax.swing.JFrame{
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
+                .addComponent(jAccName, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jAccName, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -442,7 +448,7 @@ public class Manager extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jProductMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMousePressed
-        
+
     }//GEN-LAST:event_jProductMousePressed
 
     private void jProductMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMouseMoved
@@ -450,7 +456,7 @@ public class Manager extends javax.swing.JFrame{
     }//GEN-LAST:event_jProductMouseMoved
 
     private void jRepositoryMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseMoved
-       jRepository.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jRepository.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jRepositoryMouseMoved
 
     private void jEmployerMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmployerMouseMoved
@@ -501,14 +507,15 @@ public class Manager extends javax.swing.JFrame{
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Manager().setVisible(true);
-            }
-        });
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//               
+//            }
+//        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jAccName;
     private javax.swing.JPanel jBoxController;
     private javax.swing.JPanel jBoxHeader;
     private javax.swing.JPanel jDashboard;
@@ -525,7 +532,6 @@ public class Manager extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
