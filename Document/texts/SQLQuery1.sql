@@ -100,15 +100,17 @@ CREATE TABLE groupsPers
 	date_created DATETIME,
 	date_updated DATETIME
 )
--- tạo bảng quyền người dùng
-CREATE TABLE userPers
+-- tạo bảng giao diện
+CREATE TABLE [views]
 (
-	id_user INT REFERENCES employers(id),
-	id_per INT REFERENCES groupsPers(id),
+	id INT PRIMARY KEY IDENTITY(1,1),
+	name NVARCHAR(32) NOT NULL,
+	code VARCHAR(32) NOT NULL,
 	date_created DATETIME,
 	date_updated DATETIME
 )
-
+GO
+DROP TABLE userPers
 
 -- tạo bảng chức năng
 CREATE TABLE actions
@@ -202,5 +204,42 @@ CREATE PROC checkEmail
 @email VARCHAR(265)
 AS SELECT * FROM employers WHERE email like @email
 
--- thêm danh sách quyền
-SELECT * FROM products
+-- SỬA BẢNG ACTIONS
+select * from actions
+ALTER TABLE actions
+ADD id_view INT FOREIGN KEY REFERENCES [views](id)
+
+--sửa bảng employers
+SELECT * FROM groupsPers
+ALTER TABLE employers
+ADD id_per INT FOREIGN KEY REFERENCES groupsPers(id)
+
+
+-- thêm giá trị cho quyền admin tổng
+INSERT INTO groupsPers(name,date_created) VALUES
+(N'Chủ hệ thống',GETDATE())
+SELECT * FROM employers
+UPDATE employers SET id_per = 1
+-- thêm giá trị cho view và actions
+INSERT INTO [views](name,code,date_created) VALUES
+(N'Sản phẩm','Pro',GETDATE()),
+(N'Kho','Repository',GETDATE()),
+(N'Nhân viên','Em',GETDATE()),
+(N'Thống kê','Das',GETDATE()),
+(N'Thanh toán','Pay',GETDATE())
+
+-- thêm giá trị cho actions product
+INSERT INTO actions(name,code,date_created,id_view) VALUES
+(N'Thêm Mới','P-1',GETDATE(),1),
+(N'Cập Nhật','P-2',GETDATE(),1),
+(N'Xóa','P-3',GETDATE(),1),
+(N'Xem Danh Sách','P-4',GETDATE(),1),
+(N'Sản Phẩm Tồn Kho','P-5',GETDATE(),1),
+(N'Sản Phẩm Bán Chạy','P-6',GETDATE(),1)
+-- thêm giá trị cho actions employers
+INSERT INTO actions(name,code,date_created,id_view) VALUES
+(N'Thêm Mới','E-1',GETDATE(),3),
+(N'Cập Nhật','E-2',GETDATE(),3),
+(N'Xóa','E-3',GETDATE(),3),
+(N'Xem Danh Sách','E-4',GETDATE(),3)
+
