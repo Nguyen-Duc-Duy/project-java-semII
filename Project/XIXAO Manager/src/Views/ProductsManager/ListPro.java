@@ -5,19 +5,141 @@
  */
 package Views.ProductsManager;
 
+import Controllers.DAO.ProductDAO;
+import Emtitys.Products;
+import java.awt.PopupMenu;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.ImageIcon;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author NGUYEN DUC DUY
  */
-public class ListPro extends javax.swing.JPanel {
+public class ListPro extends javax.swing.JPanel{
 
     /**
      * Creates new form ListPro
      */
-    public ListPro() {
+    Connection con;
+    ProductDAO PD;
+    interactToolbar itf;
+
+    public ListPro(Connection c, ProductsManager PM) {
+        this.con = c;
+        PD = new ProductDAO(con);
         initComponents();
+        showPopupInteract();
+        addComboBox();
+        addTableList();
+        setAutoscrolls(true);
+        itf = PM;
     }
 
+//  
+    private void addComboBox() {
+        jFillterPro.addItem("Sản phẩm mới trong ngày");
+        jFillterPro.addItem("Sản phẩm mới trong tuần");
+        jFillterPro.addItem("Theo A-Z");
+    }
+//  
+
+    private void addTableList() {
+        DefaultTableModel dtm = new DefaultTableModel();
+        List<Products> listPro = PD.getAll();
+        dtm.addColumn("#");
+        dtm.addColumn("Tên");
+        dtm.addColumn("Mã");
+        dtm.addColumn("Danh Mục");
+        dtm.addColumn("Giá");
+        dtm.addColumn("Khuyến Mãi");
+        dtm.addColumn("Mô Tả");
+        dtm.addColumn("Số Lượng");
+        dtm.addColumn("Ảnh");
+        dtm.addColumn("Đơn Vị");
+        dtm.addColumn("Trạng Thái");
+        dtm.addColumn("Ngày Tạo");
+        dtm.addColumn("Ngày Sửa");
+
+        
+        int i = 0;
+        String status = "";
+        for (Products l : listPro) {
+            Vector v = new Vector<>();
+            if (l.getStatus() == 1) {
+                status = "Hiện";
+            }
+            i++;
+            v.add(i);
+            v.add(l.getName());
+            v.add(l.getCode());
+            v.add(l.getId_cat());
+            v.add(l.getPrice());
+            v.add(l.getSale());
+            v.add(l.getDescript());
+            v.add(l.getQuantity());
+            v.add(l.getImg());
+            v.add(l.getId_unit());
+            v.add(status);
+            v.add(l.getDate_crated());
+            v.add(l.getDate_updated());
+            dtm.addRow(v);
+        }
+        jTableListPro.setModel(dtm);
+    }
+
+//  
+    private void setPopupInteract(int status) {
+        if (status == 1) {
+            jChangeSTT.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Invisible-icon.png")));
+            jChangeSTT.setText("Ẩn");
+        } else {
+            jChangeSTT.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Visible-icon.png")));
+            jChangeSTT.setText("Hiện");
+        }
+
+    }
+//  
+    interface interactToolbar {
+        public void changeToolbar(int id);
+        
+    }
+//
+    private void showPopupInteract(){
+        jTableListPro.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int r = jTableListPro.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < jTableListPro.getRowCount()) {
+                    jTableListPro.setRowSelectionInterval(r, r);
+                } else {
+                    jTableListPro.clearSelection();
+                }
+
+                int rowindex = jTableListPro.getSelectedRow();
+                if (rowindex < 0)
+                    return;
+                if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+                    jInteractPro.show(e.getComponent(), e.getX(), e.getY());
+                    if (e.getButton() == MouseEvent.BUTTON3) {
+                        jInteractPro.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                    Products p = PD.getAll().get(jTableListPro.getSelectedRow());
+                    if (p.getStatus() == 1) {
+                        setPopupInteract(1);
+                    } else {
+                        setPopupInteract(0);
+                    }
+
+                }
+            }
+        });
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,18 +149,47 @@ public class ListPro extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jInteractPro = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jChangeSTT = new javax.swing.JMenuItem();
         jListPro = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox5 = new javax.swing.JComboBox();
+        jFillterPro = new javax.swing.JComboBox();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableListPro = new javax.swing.JTable();
+
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-icon16.png"))); // NOI18N
+        jMenuItem1.setText("Thêm mới");
+        jInteractPro.add(jMenuItem1);
+
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
+        jMenuItem2.setText("Sửa");
+        jInteractPro.add(jMenuItem2);
+
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Close-icon16.png"))); // NOI18N
+        jMenuItem3.setText("Xóa");
+        jInteractPro.add(jMenuItem3);
+
+        jChangeSTT.setText("abc");
+        jInteractPro.add(jChangeSTT);
+
+        setBackground(new java.awt.Color(255, 0, 0));
+        setAutoscrolls(true);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel3.setText("Vừa thêm");
+        jLabel3.setText("Lọc");
+
+        jFillterPro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFillterProActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
         jPanel17.setLayout(jPanel17Layout);
@@ -48,12 +199,12 @@ public class ListPro extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox5, 0, 97, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jFillterPro, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel17Layout.setVerticalGroup(
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jComboBox5)
+            .addComponent(jFillterPro)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -71,12 +222,12 @@ public class ListPro extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Danh sách sản phẩm"));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableListPro.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -87,7 +238,18 @@ public class ListPro extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        jTableListPro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableListProMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTableListProMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jTableListProMouseReleased(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jTableListPro);
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -95,15 +257,15 @@ public class ListPro extends javax.swing.JPanel {
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(117, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jListProLayout = new javax.swing.GroupLayout(jListPro);
@@ -126,27 +288,46 @@ public class ListPro extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jListPro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jListPro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jListPro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jListPro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jFillterProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFillterProActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jFillterProActionPerformed
+
+    private void jTableListProMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableListProMousePressed
+        itf.changeToolbar(PD.getAll().get(jTableListPro.getSelectedRow()).getId());
+    }//GEN-LAST:event_jTableListProMousePressed
+
+    private void jTableListProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableListProMouseClicked
+
+
+    }//GEN-LAST:event_jTableListProMouseClicked
+
+    private void jTableListProMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableListProMouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTableListProMouseReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox5;
+    private javax.swing.JMenuItem jChangeSTT;
+    private javax.swing.JComboBox jFillterPro;
+    private javax.swing.JPopupMenu jInteractPro;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jListPro;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTableListPro;
     // End of variables declaration//GEN-END:variables
+
 }

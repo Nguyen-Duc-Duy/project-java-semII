@@ -35,8 +35,8 @@ public class Employers {
         this.date_updated = date_updated;
         this.id_couter = id_couter;
     }
-    //  không có id
-    public Employers(String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated,int id_couter) {
+    //  không có id,có ngày tạo
+    public Employers(String name, String email, String pass, String avt, String phone, int status, String date_created,int id_couter) {
         this.name = name;
         this.email = email;
         this.pass = pass;
@@ -44,9 +44,21 @@ public class Employers {
         this.phone = phone;
         this.status = status;
         this.date_created = date_created;
-        this.date_updated = date_updated;
         this.id_couter = id_couter;
     }
+    // có ngày cập nhật
+    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, int id_couter, String date_updated) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.pass = pass;
+        this.avt = avt;
+        this.phone = phone;
+        this.status = status;
+        this.id_couter = id_couter;
+        this.date_updated = date_updated;
+    }
+    
     //  không có tham số
     public Employers() {
     }

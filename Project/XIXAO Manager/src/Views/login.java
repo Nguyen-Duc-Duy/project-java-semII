@@ -6,11 +6,9 @@
 package Views;
 
 import Commons.ConnectData;
-import Controllers.DAO.Account;
+import Controllers.DAO.AccountDAO;
 import java.sql.Connection;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,20 +17,20 @@ import javax.swing.JOptionPane;
 public class login extends javax.swing.JFrame{
 
     /**
-     * Creates new form Account
+     * Creates new form AccountDAO
      */
     Connection connect;
     ConnectData c = new ConnectData();
-    Account acc;
+    AccountDAO acc;
 
     public login() {
         initComponents();
         setIconImage(new ImageIcon(login.class.getResource("/Commons/img/icon-logo-X-green16.png")).getImage());
         setLocationRelativeTo(null);
 //      gán giá trị cho biến để kêt nối csdl
-        connect = c.ConnectData();
+        connect = c.Connecting();
 //      khởi tạo lớp tài khoản
-        acc = new Account(connect);
+        acc = new AccountDAO(connect);
 
     }
 
@@ -56,9 +54,7 @@ public class login extends javax.swing.JFrame{
         jEmail = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jpassword = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
-        jCheckBoxRememberAcc = new javax.swing.JCheckBox();
+        jpassword = new javax.swing.JPasswordField();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jButtonLogin = new javax.swing.JButton();
@@ -127,16 +123,12 @@ public class login extends javax.swing.JFrame{
         );
 
         jbox_login.add(jPanel2);
-        jPanel2.setBounds(10, 5, 270, 40);
+        jPanel2.setBounds(10, 20, 270, 40);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setText("Mật khẩu");
 
-        jpassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jpasswordActionPerformed(evt);
-            }
-        });
+        jpassword.setText("jPasswordField1");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -155,38 +147,12 @@ public class login extends javax.swing.JFrame{
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jpassword))
+                    .addComponent(jpassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         jbox_login.add(jPanel3);
-        jPanel3.setBounds(10, 40, 270, 40);
-
-        jCheckBoxRememberAcc.setText("Nhớ tài khoản của tôi.");
-        jCheckBoxRememberAcc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxRememberAccActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jCheckBoxRememberAcc, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGap(0, 7, Short.MAX_VALUE)
-                .addComponent(jCheckBoxRememberAcc))
-        );
-
-        jbox_login.add(jPanel4);
-        jPanel4.setBounds(10, 80, 270, 30);
+        jPanel3.setBounds(10, 60, 270, 40);
         jbox_login.add(jPanel5);
         jPanel5.setBounds(20, 90, 10, 10);
 
@@ -244,10 +210,6 @@ public class login extends javax.swing.JFrame{
         // TODO add your handling code here:
     }//GEN-LAST:event_jEmailActionPerformed
 
-    private void jpasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jpasswordActionPerformed
-
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
         String email = jEmail.getText();
         String pass = jpassword.getText();
@@ -266,10 +228,6 @@ public class login extends javax.swing.JFrame{
         }
 
     }//GEN-LAST:event_jButtonLoginActionPerformed
-
-    private void jCheckBoxRememberAccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxRememberAccActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBoxRememberAccActionPerformed
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
         setVisible(false);
@@ -313,7 +271,6 @@ public class login extends javax.swing.JFrame{
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonLogin;
-    private javax.swing.JCheckBox jCheckBoxRememberAcc;
     private javax.swing.JTextField jEmail;
     private javax.swing.JLabel jErrorLogin;
     private javax.swing.JLabel jLabel1;
@@ -324,11 +281,10 @@ public class login extends javax.swing.JFrame{
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JPanel jbox_login;
-    private javax.swing.JTextField jpassword;
+    private javax.swing.JPasswordField jpassword;
     // End of variables declaration//GEN-END:variables
 }
