@@ -6,6 +6,7 @@
 package Views;
 
 import Commons.ConnectData;
+import Views.ProductsManager.ProductsManager;
 import java.awt.Cursor;
 import java.sql.Connection;
 
@@ -26,9 +27,9 @@ public class Manager extends javax.swing.JFrame {
         initComponents();
 // nhận tài khoản khi đăng nhập
         this.em = e;
-        PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
+        MethodCommon c = new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
-        connect.ConnectData();
+        connect.Connecting();
         showAcc();
 
     }
@@ -61,21 +62,12 @@ public class Manager extends javax.swing.JFrame {
         jProduct = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jRepository = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         jEmployer = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jDashboard = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
         jPay = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
-        jFeedback = new javax.swing.JPanel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -245,48 +237,7 @@ public class Manager extends javax.swing.JFrame {
 
         jBoxController.add(jProduct);
 
-        jRepository.setBackground(new java.awt.Color(255, 102, 102));
-        jRepository.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jRepositoryMouseMoved(evt);
-            }
-        });
-        jRepository.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jRepositoryMouseClicked(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("Nhập kho");
-        jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/inside-2-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jRepositoryLayout = new javax.swing.GroupLayout(jRepository);
-        jRepository.setLayout(jRepositoryLayout);
-        jRepositoryLayout.setHorizontalGroup(
-            jRepositoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jRepositoryLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jRepositoryLayout.setVerticalGroup(
-            jRepositoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jRepositoryLayout.createSequentialGroup()
-                .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jRepository);
-
-        jEmployer.setBackground(new java.awt.Color(255, 153, 51));
+        jEmployer.setBackground(new java.awt.Color(255, 204, 0));
         jEmployer.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 jEmployerMouseMoved(evt);
@@ -321,42 +272,6 @@ public class Manager extends javax.swing.JFrame {
         );
 
         jBoxController.add(jEmployer);
-
-        jDashboard.setBackground(new java.awt.Color(234, 234, 88));
-        jDashboard.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jDashboardMouseMoved(evt);
-            }
-        });
-
-        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel12.setText("Thống kê");
-        jLabel12.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/stats-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jDashboardLayout = new javax.swing.GroupLayout(jDashboard);
-        jDashboard.setLayout(jDashboardLayout);
-        jDashboardLayout.setHorizontalGroup(
-            jDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDashboardLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jDashboardLayout.setVerticalGroup(
-            jDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDashboardLayout.createSequentialGroup()
-                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jDashboard);
 
         jPay.setBackground(new java.awt.Color(204, 102, 255));
         jPay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -393,42 +308,6 @@ public class Manager extends javax.swing.JFrame {
 
         jBoxController.add(jPay);
 
-        jFeedback.setBackground(new java.awt.Color(0, 153, 153));
-        jFeedback.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jFeedbackMouseMoved(evt);
-            }
-        });
-
-        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("Phản hồi");
-        jLabel16.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/mail-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jFeedbackLayout = new javax.swing.GroupLayout(jFeedback);
-        jFeedback.setLayout(jFeedbackLayout);
-        jFeedbackLayout.setHorizontalGroup(
-            jFeedbackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jFeedbackLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jFeedbackLayout.setVerticalGroup(
-            jFeedbackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jFeedbackLayout.createSequentialGroup()
-                .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jFeedback);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -448,36 +327,21 @@ public class Manager extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jProductMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMousePressed
-
+        ProductsManager PM = new ProductsManager();
+        PM.setVisible(true);
     }//GEN-LAST:event_jProductMousePressed
 
     private void jProductMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMouseMoved
         jProduct.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jProductMouseMoved
 
-    private void jRepositoryMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseMoved
-        jRepository.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jRepositoryMouseMoved
-
     private void jEmployerMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmployerMouseMoved
         jEmployer.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jEmployerMouseMoved
 
-    private void jDashboardMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jDashboardMouseMoved
-        jDashboard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jDashboardMouseMoved
-
     private void jPayMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseMoved
         jPay.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jPayMouseMoved
-
-    private void jFeedbackMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFeedbackMouseMoved
-        jFeedback.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jFeedbackMouseMoved
-
-    private void jRepositoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseClicked
-        jProduct.setVisible(true);
-    }//GEN-LAST:event_jRepositoryMouseClicked
 
     /**
      * @param args the command line arguments
@@ -518,23 +382,15 @@ public class Manager extends javax.swing.JFrame {
     private javax.swing.JLabel jAccName;
     private javax.swing.JPanel jBoxController;
     private javax.swing.JPanel jBoxHeader;
-    private javax.swing.JPanel jDashboard;
     private javax.swing.JPanel jEmployer;
-    private javax.swing.JPanel jFeedback;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -543,6 +399,5 @@ public class Manager extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPay;
     private javax.swing.JPanel jProduct;
-    private javax.swing.JPanel jRepository;
     // End of variables declaration//GEN-END:variables
 }
