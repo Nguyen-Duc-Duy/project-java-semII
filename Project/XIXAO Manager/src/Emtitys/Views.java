@@ -9,38 +9,50 @@ package Emtitys;
  *
  * @author NGUYEN DUC DUY
  */
-public class UersPers {
+public class Views {
 //Trường thuộc tính
-    int id_user;
-    int id_per;
+    int id;
+    String name;
+    String code;
     String date_created;
     String date_updated;
 //Phương thức khởi tạo
-    public UersPers(int id_user, int id_per, String date_created, String date_updated) {
-        this.id_user = id_user;
-        this.id_per = id_per;
+
+    public Views(int id, String name, String code, String date_created, String date_updated) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
         this.date_created = date_created;
         this.date_updated = date_updated;
     }
+    
     //không có tham số
-    public UersPers() {
+    public Views() {
     }
 //Phương thức khởi tạo
 
-    public int getId_user() {
-        return id_user;
+    public int getId() {
+        return id;
     }
 
-    public void setId_user(int id_user) {
-        this.id_user = id_user;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getId_per() {
-        return id_per;
+    public String getName() {
+        return name;
     }
 
-    public void setId_per(int id_per) {
-        this.id_per = id_per;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getDate_created() {
@@ -58,7 +70,7 @@ public class UersPers {
     public void setDate_updated(String date_updated) {
         this.date_updated = date_updated;
     }
-    
+
     
 
 }

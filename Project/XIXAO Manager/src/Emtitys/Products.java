@@ -5,15 +5,17 @@
  */
 package Emtitys;
 
+import java.io.Serializable;
+
 /**
  *
  * @author NGUYEN DUC DUY
  */
-public class Products {
+public class Products implements Serializable,Comparable<Products>{
     int id;
     String name;
-    String code;
     int id_cat;
+    int code;
     float price;
     float sale;
     String descript;
@@ -24,11 +26,11 @@ public class Products {
     String date_crated;
     String date_updated;
 
-    public Products(int id, String name, String code, int id_cat, float price, float sale, String descript, int quantity, String img, int id_unit, int status, String date_crated, String date_updated) {
+    public Products(int id, String name,int id_cat,int code, float price, float sale, String descript, int quantity, String img, int id_unit, int status, String date_crated, String date_updated) {
         this.id = id;
         this.name = name;
-        this.code = code;
         this.id_cat = id_cat;
+        this.code = code;
         this.price = price;
         this.sale = sale;
         this.descript = descript;
@@ -40,10 +42,10 @@ public class Products {
         this.date_updated = date_updated;
     }
 
-    public Products(String name, String code, int id_cat, float price, float sale, String descript, int quantity, String img,int id_unit, int status, String date_crated) {
+    public Products(String name, int id_cat,int code, float price, float sale, String descript, int quantity, String img,int id_unit, int status, String date_crated) {
         this.name = name;
-        this.code = code;
         this.id_cat = id_cat;
+        this.code = code;
         this.price = price;
         this.sale = sale;
         this.descript = descript;
@@ -54,10 +56,9 @@ public class Products {
         this.date_crated = date_crated;
     }
 
-    public Products(int id, String name, String code, int id_cat, float price, float sale, String descript, int quantity, String img, int id_unit, int status, String date_updated) {
+    public Products(int id, String name, int id_cat, float price, float sale, String descript, int quantity, String img, int id_unit, int status, String date_updated) {
         this.id = id;
         this.name = name;
-        this.code = code;
         this.id_cat = id_cat;
         this.price = price;
         this.sale = sale;
@@ -88,13 +89,6 @@ public class Products {
         this.name = name;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
 
     public int getId_cat() {
         return id_cat;
@@ -102,6 +96,14 @@ public class Products {
 
     public void setId_cat(int id_cat) {
         this.id_cat = id_cat;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public float getPrice() {
@@ -175,6 +177,20 @@ public class Products {
     public void setDate_updated(String date_updated) {
         this.date_updated = date_updated;
     }
+
+    @Override
+    public String toString() {
+        return "Products{" + "id=" + id + ", name=" + name + ", id_cat=" + id_cat + ", code=" + code + ", price=" + price + ", sale=" + sale + ", descript=" + descript + ", quantity=" + quantity + ", img=" + img + ", id_unit=" + id_unit + ", status=" + status + ", date_crated=" + date_crated + ", date_updated=" + date_updated + '}';
+    }
+
+    @Override
+    public int compareTo(Products o) {
+        return o.getName().compareToIgnoreCase(this.getName());
+    }
+
+
+
+
     
     
 }

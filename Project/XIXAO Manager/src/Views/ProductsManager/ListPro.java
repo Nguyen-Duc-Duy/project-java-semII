@@ -5,12 +5,17 @@
  */
 package Views.ProductsManager;
 
+import Controllers.DAO.GroupsPerDAO;
+import Controllers.DAO.PerAccDAO;
 import Controllers.DAO.ProductDAO;
+import Emtitys.Employers;
 import Emtitys.Products;
-import java.awt.PopupMenu;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ImageIcon;
@@ -21,7 +26,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author NGUYEN DUC DUY
  */
-public class ListPro extends javax.swing.JPanel{
+public class ListPro extends javax.swing.JPanel {
 
     /**
      * Creates new form ListPro
@@ -29,32 +34,70 @@ public class ListPro extends javax.swing.JPanel{
     Connection con;
     ProductDAO PD;
     interactToolbar itf;
+    DefaultTableModel dtm;
+    GroupsPerDAO GPD;
+    Employers em;
 
-    public ListPro(Connection c, ProductsManager PM) {
+    public ListPro(Connection c, ProductsManager PM, Employers em) {
         this.con = c;
+        this.em = em;
         PD = new ProductDAO(con);
+        GPD = new GroupsPerDAO(c);
+
         initComponents();
+        RolesActions();
+
         showPopupInteract();
         addComboBox();
-        addTableList();
+        addTableList(PD.getAll());
         setAutoscrolls(true);
         itf = PM;
     }
+//  phân quyền 
 
-//  
-    private void addComboBox() {
-        jFillterPro.addItem("Sản phẩm mới trong ngày");
-        jFillterPro.addItem("Sản phẩm mới trong tuần");
-        jFillterPro.addItem("Theo A-Z");
+    private void RolesActions() {
+        List<String> listActionsByEm = GPD.listActByEm(em.getId());
+
+        jUpdateProPU.setVisible(false);
+        jDeleteProPU.setVisible(false);
+        jChangeSTTPU.setVisible(false);
+        if (em.getStatus() == 2) {
+            jUpdateProPU.setVisible(true);
+            jDeleteProPU.setVisible(true);
+            jChangeSTTPU.setVisible(true);
+        }else{
+            for (String ActionsByEm : listActionsByEm) {
+                switch (ActionsByEm) {
+                    case "P-2":
+                        jUpdateProPU.setVisible(true);
+                        break;
+                    case "P-3":
+                        jDeleteProPU.setVisible(true);
+                        break;
+                    case "P-6":
+                        jChangeSTTPU.setVisible(true);
+                        break;
+                }
+            }
+        }
     }
 //  
 
-    private void addTableList() {
-        DefaultTableModel dtm = new DefaultTableModel();
-        List<Products> listPro = PD.getAll();
+    private void addComboBox() {
+        jFillterPro.addItem("");
+        jFillterPro.addItem("Theo A-Z");
+        jFillterPro.addItem("Sản phẩm mới trong ngày");
+        jFillterPro.addItem("Sản phẩm mới trong tuần");
+
+    }
+
+//  
+    private void addTableList(List<Products> ListPro) {
+        dtm = new DefaultTableModel();
+        List<Products> listPro = ListPro;
         dtm.addColumn("#");
         dtm.addColumn("Tên");
-        dtm.addColumn("Mã");
+        dtm.addColumn("Code");
         dtm.addColumn("Danh Mục");
         dtm.addColumn("Giá");
         dtm.addColumn("Khuyến Mãi");
@@ -66,13 +109,14 @@ public class ListPro extends javax.swing.JPanel{
         dtm.addColumn("Ngày Tạo");
         dtm.addColumn("Ngày Sửa");
 
-        
         int i = 0;
         String status = "";
         for (Products l : listPro) {
             Vector v = new Vector<>();
             if (l.getStatus() == 1) {
                 status = "Hiện";
+            } else {
+                status = "Ẩn";
             }
             i++;
             v.add(i);
@@ -89,6 +133,7 @@ public class ListPro extends javax.swing.JPanel{
             v.add(l.getDate_crated());
             v.add(l.getDate_updated());
             dtm.addRow(v);
+
         }
         jTableListPro.setModel(dtm);
     }
@@ -96,21 +141,31 @@ public class ListPro extends javax.swing.JPanel{
 //  
     private void setPopupInteract(int status) {
         if (status == 1) {
-            jChangeSTT.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Invisible-icon.png")));
-            jChangeSTT.setText("Ẩn");
+            jChangeSTTPU.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Invisible-icon.png")));
+            jChangeSTTPU.setText("Ẩn");
         } else {
-            jChangeSTT.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Visible-icon.png")));
-            jChangeSTT.setText("Hiện");
+            jChangeSTTPU.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Visible-icon.png")));
+            jChangeSTTPU.setText("Hiện");
         }
 
     }
 //  
+
     interface interactToolbar {
+
         public void changeToolbar(int id);
-        
+
+        public void changeInforPopup(int id);
+
+        public void deletePro(int id);
+
+        public void changeSTT(int id, int status);
     }
 //
-    private void showPopupInteract(){
+    int idPopup = 0;
+    int statusPopup = 0;
+
+    private void showPopupInteract() {
         jTableListPro.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -122,14 +177,17 @@ public class ListPro extends javax.swing.JPanel{
                 }
 
                 int rowindex = jTableListPro.getSelectedRow();
-                if (rowindex < 0)
+                if (rowindex < 0) {
                     return;
-                if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+                }
+                if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
                     jInteractPro.show(e.getComponent(), e.getX(), e.getY());
                     if (e.getButton() == MouseEvent.BUTTON3) {
                         jInteractPro.show(e.getComponent(), e.getX(), e.getY());
                     }
                     Products p = PD.getAll().get(jTableListPro.getSelectedRow());
+                    idPopup = p.getId();
+                    statusPopup = p.getStatus();
                     if (p.getStatus() == 1) {
                         setPopupInteract(1);
                     } else {
@@ -140,6 +198,7 @@ public class ListPro extends javax.swing.JPanel{
             }
         });
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -150,10 +209,9 @@ public class ListPro extends javax.swing.JPanel{
     private void initComponents() {
 
         jInteractPro = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jChangeSTT = new javax.swing.JMenuItem();
+        jUpdateProPU = new javax.swing.JMenuItem();
+        jDeleteProPU = new javax.swing.JMenuItem();
+        jChangeSTTPU = new javax.swing.JMenuItem();
         jListPro = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
@@ -163,20 +221,31 @@ public class ListPro extends javax.swing.JPanel{
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableListPro = new javax.swing.JTable();
 
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-icon16.png"))); // NOI18N
-        jMenuItem1.setText("Thêm mới");
-        jInteractPro.add(jMenuItem1);
+        jUpdateProPU.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
+        jUpdateProPU.setText("Sửa");
+        jUpdateProPU.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jUpdateProPUActionPerformed(evt);
+            }
+        });
+        jInteractPro.add(jUpdateProPU);
 
-        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
-        jMenuItem2.setText("Sửa");
-        jInteractPro.add(jMenuItem2);
+        jDeleteProPU.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Close-icon16.png"))); // NOI18N
+        jDeleteProPU.setText("Xóa");
+        jDeleteProPU.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jDeleteProPUActionPerformed(evt);
+            }
+        });
+        jInteractPro.add(jDeleteProPU);
 
-        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Close-icon16.png"))); // NOI18N
-        jMenuItem3.setText("Xóa");
-        jInteractPro.add(jMenuItem3);
-
-        jChangeSTT.setText("abc");
-        jInteractPro.add(jChangeSTT);
+        jChangeSTTPU.setText("abc");
+        jChangeSTTPU.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jChangeSTTPUActionPerformed(evt);
+            }
+        });
+        jInteractPro.add(jChangeSTTPU);
 
         setBackground(new java.awt.Color(255, 0, 0));
         setAutoscrolls(true);
@@ -297,11 +366,26 @@ public class ListPro extends javax.swing.JPanel{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jFillterProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFillterProActionPerformed
-        // TODO add your handling code here:
+        int rowSelectSort = jFillterPro.getSelectedIndex();
+        if (rowSelectSort == 1) {
+            addTableList(PD.sortToAToZ());
+        } else if (rowSelectSort == 2) {
+            DateFormat dateSQL = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar calendar = Calendar.getInstance();
+            addTableList(PD.listProInDay(dateSQL.format(calendar.getTime())));
+        }else if(rowSelectSort == 3){
+            addTableList(PD.listProOfWeek());
+        } else {
+            addTableList(PD.getAll());
+        }
     }//GEN-LAST:event_jFillterProActionPerformed
 
     private void jTableListProMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableListProMousePressed
-        itf.changeToolbar(PD.getAll().get(jTableListPro.getSelectedRow()).getId());
+        try {
+            itf.changeToolbar(PD.getAll().get(jTableListPro.getSelectedRow()).getId());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }//GEN-LAST:event_jTableListProMousePressed
 
     private void jTableListProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableListProMouseClicked
@@ -313,21 +397,34 @@ public class ListPro extends javax.swing.JPanel{
         // TODO add your handling code here:
     }//GEN-LAST:event_jTableListProMouseReleased
 
+    private void jUpdateProPUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateProPUActionPerformed
+        itf.changeToolbar(idPopup);
+        itf.changeInforPopup(idPopup);
+    }//GEN-LAST:event_jUpdateProPUActionPerformed
+
+    private void jDeleteProPUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteProPUActionPerformed
+        itf.changeToolbar(idPopup);
+        itf.deletePro(idPopup);
+    }//GEN-LAST:event_jDeleteProPUActionPerformed
+
+    private void jChangeSTTPUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jChangeSTTPUActionPerformed
+        itf.changeSTT(idPopup, statusPopup);
+    }//GEN-LAST:event_jChangeSTTPUActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem jChangeSTT;
+    private javax.swing.JMenuItem jChangeSTTPU;
+    private javax.swing.JMenuItem jDeleteProPU;
     private javax.swing.JComboBox jFillterPro;
     private javax.swing.JPopupMenu jInteractPro;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jListPro;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTableListPro;
+    public javax.swing.JTable jTableListPro;
+    private javax.swing.JMenuItem jUpdateProPU;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -5,11 +5,16 @@
  */
 package Views.ProductsManager.UnitsManager;
 
+import Controllers.DAO.GroupsPerDAO;
 import Controllers.DAO.UnitDAO;
+import Emtitys.Employers;
 import Emtitys.Units;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,27 +28,79 @@ public class UnitsManager extends javax.swing.JPanel {
      */
     Connection con;
     UnitDAO UD;
+    GroupsPerDAO GPD;
+    Employers em;
 
-    public UnitsManager(Connection c) {
+    public UnitsManager(Connection c, Employers em) {
         this.con = c;
+        this.em = em;
+
         UD = new UnitDAO(c);
+        GPD = new GroupsPerDAO(c);
         initComponents();
-        addTableListU();
+        defaultInterface();
+        showPopupUnit();
+        RolesActions();
+    }
+
+    //  phân quyền
+    private void RolesActions() {
+        List<String> listActionsByEm = GPD.listActByEm(em.getId());
+        jAddUnit.setVisible(false);
+        jUpdateUnit.setVisible(false);
+        jAddUnit.setVisible(false);
+        jBoxUnit.setVisible(false);
+        jPUCreateUnit.setVisible(false);
+        jPUUpdateUnit.setVisible(false);
+        if (em.getStatus() == 2) {
+            jAddUnit.setVisible(true);
+            jUpdateUnit.setVisible(true);
+            jAddUnit.setVisible(true);
+            jBoxUnit.setVisible(true);
+            jPUCreateUnit.setVisible(true);
+            jPUUpdateUnit.setVisible(true);
+        } else {
+            for (String ActionsByEm : listActionsByEm) {
+                switch (ActionsByEm) {
+                    case "U-1":
+                        jAddUnit.setVisible(true);
+                        jPUCreateUnit.setVisible(true);
+                        jBoxUnit.setVisible(true);
+                        break;
+                    case "U-2":
+                        jUpdateUnit.setVisible(true);
+                        jPUUpdateUnit.setVisible(true);
+                        jBoxUnit.setVisible(true);
+                        break;
+                    case "U-4":
+                        jBoxUnit.setVisible(false);
+                        break;
+                }
+            }
+        }
         
+    }
+//    giao diện mặc định
+
+    private void defaultInterface() {
+        addTableListU(UD.getAll());
+        jAddUnit.setVisible(true);
+        jUpdateUnit.setVisible(false);
+        jNameU.setText("");
     }
 //
 
-    private void addTableListU() {
+    private void addTableListU(List<Units> listUnit) {
         DefaultTableModel dtm = new DefaultTableModel();
-        List<Units> listU = UD.getAll();
+        List<Units> listU = listUnit;
         dtm.addColumn("#");
         dtm.addColumn("Đơn Vị");
         dtm.addColumn("Ngày Tạo");
         dtm.addColumn("Ngày Cập Nhật");
 
-        Vector v = new Vector();
         int i = 0;
         for (Units u : listU) {
+            Vector v = new Vector();
             i++;
             v.add(i);
             v.add(u.getName());
@@ -65,33 +122,41 @@ public class UnitsManager extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        jInteractUnit = new javax.swing.JPopupMenu();
+        jPUCreateUnit = new javax.swing.JMenuItem();
+        jPUUpdateUnit = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jListUnits = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
+        jBoxUnit = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        jNameU = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jAddUnit = new javax.swing.JButton();
+        jUpdateUnit = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jSearchUnits = new javax.swing.JTextField();
 
-        jMenuItem1.setText("Thêm");
-        jPopupMenu1.add(jMenuItem1);
+        jPUCreateUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-icon16.png"))); // NOI18N
+        jPUCreateUnit.setText("Thêm");
+        jPUCreateUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPUCreateUnitActionPerformed(evt);
+            }
+        });
+        jInteractUnit.add(jPUCreateUnit);
 
-        jMenuItem2.setText("Sửa");
-        jPopupMenu1.add(jMenuItem2);
-
-        jMenuItem3.setText("Xóa");
-        jPopupMenu1.add(jMenuItem3);
+        jPUUpdateUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
+        jPUUpdateUnit.setText("Sửa");
+        jPUUpdateUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPUUpdateUnitActionPerformed(evt);
+            }
+        });
+        jInteractUnit.add(jPUUpdateUnit);
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Đơn Vị", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
         setPreferredSize(new java.awt.Dimension(725, 312));
@@ -107,22 +172,32 @@ public class UnitsManager extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jListUnits);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin Đơn Vị của Sản Phẩm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
-
-        jLabel2.setText("Tên loại đơn vị");
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-1-icon.png"))); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+        jListUnits.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jListUnitsMouseClicked(evt);
             }
         });
-        jPanel3.add(jButton2);
+        jScrollPane2.setViewportView(jListUnits);
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon.png"))); // NOI18N
-        jPanel3.add(jButton3);
+        jBoxUnit.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin Đơn Vị của Sản Phẩm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+
+        jLabel2.setText("Tên đơn vị");
+
+        jAddUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-1-icon.png"))); // NOI18N
+        jAddUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jAddUnitActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jAddUnit);
+
+        jUpdateUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon.png"))); // NOI18N
+        jUpdateUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jUpdateUnitActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jUpdateUnit);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -131,7 +206,7 @@ public class UnitsManager extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2)
+                    .addComponent(jNameU)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
@@ -142,23 +217,29 @@ public class UnitsManager extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jNameU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jLabel3.setForeground(new java.awt.Color(255, 51, 51));
+
+        javax.swing.GroupLayout jBoxUnitLayout = new javax.swing.GroupLayout(jBoxUnit);
+        jBoxUnit.setLayout(jBoxUnitLayout);
+        jBoxUnitLayout.setHorizontalGroup(
+            jBoxUnitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jBoxUnitLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        jBoxUnitLayout.setVerticalGroup(
+            jBoxUnitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBoxUnitLayout.createSequentialGroup()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -168,29 +249,29 @@ public class UnitsManager extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jBoxUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jBoxUnit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel1.setText("Tìm kiếm");
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        jSearchUnits.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                jSearchUnitsActionPerformed(evt);
             }
         });
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/print-icon.png"))); // NOI18N
-        jButton1.setText("In");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jSearchUnits.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jSearchUnitsKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jSearchUnitsKeyReleased(evt);
             }
         });
 
@@ -202,22 +283,17 @@ public class UnitsManager extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jSearchUnits, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(355, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())))
+                    .addComponent(jSearchUnits, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -236,37 +312,98 @@ public class UnitsManager extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void jSearchUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSearchUnitsActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_jSearchUnitsActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jAddUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddUnitActionPerformed
+        String nameUnit = jNameU.getText();
+        UD.createUnit(new Units(nameUnit, ""));
+        defaultInterface();
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jAddUnitActionPerformed
+    int idUnitSelected;
+//    hiển thị popup tương tác
+
+    private void showPopupUnit() {
+        jListUnits.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
+                    if (e.getButton() == MouseEvent.BUTTON3) {
+                        jInteractUnit.show(e.getComponent(), e.getX(), e.getY());
+                        idUnitSelected = UD.getAll().get(jListUnits.getSelectedRow()).getId();
+
+                    }
+                }
+            }
+
+        });
+    }
+    private void jListUnitsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListUnitsMouseClicked
+
+    }//GEN-LAST:event_jListUnitsMouseClicked
+
+    private void jPUCreateUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPUCreateUnitActionPerformed
+        jBoxUnit.setVisible(true);
+        jNameU.setText("");
+        jNameU.requestFocus(true);
+    }//GEN-LAST:event_jPUCreateUnitActionPerformed
+
+    private void jPUUpdateUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPUUpdateUnitActionPerformed
+        jBoxUnit.setVisible(true);
+        jAddUnit.setVisible(false);
+        jUpdateUnit.setVisible(true);
+        Units u = new Units();
+        try {
+            u = UD.getAll().get(idUnitSelected);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        jNameU.setText(u.getName());
+        jNameU.requestFocus(true);
+    }//GEN-LAST:event_jPUUpdateUnitActionPerformed
+
+    private void jUpdateUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateUnitActionPerformed
+        String nameUnitUpdate = jNameU.getText();
+        UD.updateUnit(new Units(idUnitSelected, nameUnitUpdate, ""));
+        defaultInterface();
+    }//GEN-LAST:event_jUpdateUnitActionPerformed
+
+    private void jSearchUnitsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jSearchUnitsKeyPressed
+
+
+    }//GEN-LAST:event_jSearchUnitsKeyPressed
+
+    private void jSearchUnitsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jSearchUnitsKeyReleased
+        String search = jSearchUnits.getText();
+        if (search.equalsIgnoreCase("")) {
+            addTableListU(UD.getAll());
+        } else {
+            addTableListU(UD.searchUnit(search));
+        }
+    }//GEN-LAST:event_jSearchUnitsKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jAddUnit;
+    private javax.swing.JPanel jBoxUnit;
+    private javax.swing.JPopupMenu jInteractUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JTable jListUnits;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JTextField jNameU;
+    private javax.swing.JMenuItem jPUCreateUnit;
+    private javax.swing.JMenuItem jPUUpdateUnit;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jSearchUnits;
+    private javax.swing.JButton jUpdateUnit;
     // End of variables declaration//GEN-END:variables
 }

@@ -18,5 +18,5 @@ public interface ICategory {
     public void updateCat(Categorys c);
     public void changeSTT(int id,int status);
     public void deleteCat(int id);
-    public void printCat();
+    public List<Categorys> searchCat(String key);
 }

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -95,7 +96,6 @@ public class InforPro extends javax.swing.JPanel {
 
         }
         jNamePro.setText(p.getName());
-        jCodePro.setText(p.getCode());
         jSalePro.setText(String.valueOf(p.getSale()));
         jPricePro.setText(String.valueOf(p.getPrice()));
         jQuantiryPro.setText(Integer.toString(p.getQuantity()));
@@ -115,9 +115,6 @@ public class InforPro extends javax.swing.JPanel {
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jNamePro = new javax.swing.JTextField();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jCodePro = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jCategorys = new javax.swing.JComboBox();
@@ -165,25 +162,6 @@ public class InforPro extends javax.swing.JPanel {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jNamePro, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-        );
-
-        jLabel4.setText("Mã sản phẩm");
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCodePro, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jCodePro, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -371,7 +349,6 @@ public class InforPro extends javax.swing.JPanel {
                         .addGroup(jCreateProLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -392,20 +369,19 @@ public class InforPro extends javax.swing.JPanel {
                         .addGap(12, 12, 12)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 27, Short.MAX_VALUE))
                     .addGroup(jCreateProLayout.createSequentialGroup()
                         .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -427,27 +403,37 @@ public class InforPro extends javax.swing.JPanel {
     int returnVal;
     private void jImgProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jImgProActionPerformed
         returnVal = file.showOpenDialog(file);
-
     }//GEN-LAST:event_jImgProActionPerformed
 
     private void jSaveProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveProActionPerformed
         String name = jNamePro.getText();
-        String code = jCodePro.getText();
         int id_cat = listCat.get(jCategorys.getSelectedIndex()).getId();
         Float price = Float.parseFloat(jPricePro.getText());
         Float sale = Float.parseFloat(jSalePro.getText());
         String Descript = jDescriptPro.getText();
         int id_unit = listU.get(jUnits.getSelectedIndex()).getId();
         int quantity = Integer.valueOf(jQuantiryPro.getText());
-        String img = file.getSelectedFile().getName();
-        Products p = new Products(name, code, id_cat, price, sale, Descript, quantity, img, id_unit, 1, Descript);
+        String img = "";
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (file.getSelectedFile() == null) {
+                JOptionPane.showMessageDialog(jCreatePro, "Vui lòng chọn ảnh mô tả của sản phẩm !");
+                returnVal = file.showOpenDialog(file);
+                img = file.getSelectedFile().getName();
+            } else {
+                img = file.getSelectedFile().getName();
+            }
+
+        } else {
+            img = "img.png";
+        }
+        int code = (int) (Math.random() * (999999999-111111111));
+        Products p = new Products(name, id_cat,code, price, sale, Descript, quantity, img, id_unit, 1, Descript);
         PD.createPro(p);
     }//GEN-LAST:event_jSaveProActionPerformed
 
     private void jUpdateProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateProActionPerformed
         int id = idProSelected;
         String name = jNamePro.getText();
-        String code = jCodePro.getText();
         int id_cat = listCat.get(jCategorys.getSelectedIndex()).getId();
         Float price = Float.parseFloat(jPricePro.getText());
         Float sale = Float.parseFloat(jSalePro.getText());
@@ -457,20 +443,23 @@ public class InforPro extends javax.swing.JPanel {
 
         String img = "";
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            System.out.println("ok");
+            if (file.getSelectedFile() == null) {
+                JOptionPane.showMessageDialog(jCreatePro, "Vui lòng chọn ảnh mô tả của sản phẩm !");
+                returnVal = file.showOpenDialog(file);
+                img = file.getSelectedFile().getName();
+            } else {
+                img = file.getSelectedFile().getName();
+            }
         } else {
-            System.out.println("false");
-
+            img = "img.png";
         }
-
-        Products p = new Products(id, name, code, id_cat, price, sale, Descript, quantity, img, id_unit, 1, Descript);
+        Products p = new Products(id, name, id_cat, price, sale, Descript, quantity, img, id_unit, 1, Descript);
         PD.updatePro(p);
     }//GEN-LAST:event_jUpdateProActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jCategorys;
-    private javax.swing.JTextField jCodePro;
     private javax.swing.JPanel jCreatePro;
     private javax.swing.JTextArea jDescriptPro;
     private javax.swing.JButton jImgPro;
@@ -479,7 +468,6 @@ public class InforPro extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -492,7 +480,6 @@ public class InforPro extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JTextField jPricePro;
     private javax.swing.JTextField jQuantiryPro;

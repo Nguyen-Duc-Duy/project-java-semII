@@ -16,6 +16,5 @@ public interface IUnits {
     public List<Units> getAll();
     public void createUnit(Units u);
     public void updateUnit(Units u);
-    public void deleteUnit(int id);
-    public void printUnit();
+    public List<Units> searchUnit(String key);
 }
