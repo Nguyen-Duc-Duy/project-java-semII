@@ -433,7 +433,7 @@ public class Manager extends javax.swing.JFrame {
     }//GEN-LAST:event_jPayMouseMoved
 
     private void jPayMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseClicked
-        PaysManager PM = new PaysManager(c, em.getId());
+        PaysManager PM = new PaysManager(c, em);
         PM.setVisible(true);
     }//GEN-LAST:event_jPayMouseClicked
 

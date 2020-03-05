@@ -12,15 +12,18 @@ import Controllers.DAO.EmployeesDAO;
 import Controllers.DAO.GroupsPerDAO;
 import Controllers.DAO.PerAccDAO;
 import Controllers.DAO.ViewsDAO;
-import Emtitys.ActionViewModel;
 import Emtitys.Actions;
 import Emtitys.Couters;
 import Emtitys.Employers;
 import Emtitys.GroupsPers;
 import Emtitys.PersActions;
+import Emtitys.Products;
 import Emtitys.Views;
 import Views.MethodCommon;
 import Views.ProductsManager.ListPro;
+import com.gembox.spreadsheet.ExcelFile;
+import com.gembox.spreadsheet.ExcelWorksheet;
+import com.gembox.spreadsheet.SpreadsheetInfo;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -29,19 +32,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
@@ -79,36 +81,40 @@ public class EmployeesManager extends javax.swing.JFrame {
         CD = new CoutersDAO(c);
 
         initComponents();
-
+        setLocationRelativeTo(null);
         new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
 
         showPerssion();
+        defaultBoxInforEm();
+        addComboBoxFillEm();
         interfaceDefaultEmployee();
 
         interfaceDefaultGroupPer();
 
         setDefaultCloseOperation(EmployeesManager.DISPOSE_ON_CLOSE);
+
         roleViews();
         roleActions();
+
     }
 //  phân quyền
 //      giao diện giữa nhân viên và quyền
 
     private void roleViews() {
-        jBoxPanel.remove(jEm);
-        jBoxPanel.remove(jPer);
+        jBoxTabPanel.remove(jEm);
+        jBoxTabPanel.remove(jPer);
 
         if (em.getStatus() == 2) {
-            jBoxPanel.addTab("Nhân viên", jEm);
-            jBoxPanel.addTab("Nhóm quyền", jPer);
+            jBoxTabPanel.addTab("Nhân viên", jEm);
+            jBoxTabPanel.addTab("Nhóm quyền", jPer);
         } else {
             List<String> listPAByEm = GPD.listPerActByEm(em.getId());
             for (String PAByEm : listPAByEm) {
                 switch (PAByEm) {
                     case "Em":
-                        jBoxPanel.addTab("Nhân viên", jEm);
+                        jBoxTabPanel.addTab("Nhân viên", jEm);
                     case "Per":
-                        jBoxPanel.addTab("Nhóm quyền", jPer);
+                        jBoxTabPanel.addTab("Nhóm quyền", jPer);
                 }
             }
         }
@@ -117,31 +123,61 @@ public class EmployeesManager extends javax.swing.JFrame {
 //    hành động
 
     private void roleActions() {
-        jInforEm.setVisible(false);
+//      chức năng của nhân viên
         jCreateEm.setVisible(false);
-        jSaveEm.setVisible(false);
+        jUpdatePopupEm.setVisible(false);
+        jCreatePopupEm.setVisible(false);
+        jDeletePopupEm.setVisible(false);
+        jPrintListEm.setVisible(false);
+        jChangeSTTpopupEm.setVisible(true);
+//      chức năng của nhóm quyền
+        jBoxActions.setVisible(false);
+        jCreateGPPopup.setVisible(false);
+        jUpdateGPPopup.setVisible(false);
         if (em.getStatus() == 2) {
-            jInforEm.setVisible(true);
+//          nhân viên
             jCreateEm.setVisible(true);
-            jSaveEm.setVisible(true);
+            jUpdatePopupEm.setVisible(true);
+            jCreatePopupEm.setVisible(true);
+            jDeletePopupEm.setVisible(true);
+            jPrintListEm.setVisible(true);
+            jChangeSTTpopupEm.setVisible(true);
+//          nhóm quyền
+            jBoxActions.setVisible(false);
+            jCreateGPPopup.setVisible(true);
+            jUpdateGPPopup.setVisible(true);
         } else {
             List<String> listActByEm = GPD.listPerActByEm(em.getId());
             for (String ActByEm1 : listActByEm) {
                 switch (ActByEm1) {
-                    case "":
+//                    nhân viên
+                    case "E-1":
+                        jCreatePopupEm.setVisible(true);
+                    case "E-2":
+                        jUpdatePopupEm.setVisible(true);
+                        break;
+                    case "E-3":
+                        jDeletePopupEm.setVisible(true);
+                        break;
+                    case "E-4":
+                        jBoxListEm.setVisible(true);
+                        break;
+                    case "E-6":
+                        jChangeSTTpopupEm.setVisible(true);
+                        break;
+//                        nhóm quền
+                    case "PER-1":
+                        jCreateGPPopup.setVisible(true);
+                        jBoxActions.setVisible(true);
+                        break;
+                    case "E-5":
+                        jBoxActions.setVisible(true);
+                        jUpdateGPPopup.setVisible(true);
                         break;
                 }
             }
         }
 
-    }
-// xét layout
-
-    private void setLayerEm(JPanel panel) {
-        jLayeredPane1.removeAll();
-        jLayeredPane1.add(panel);
-        jLayeredPane1.repaint();
-        jLayeredPane1.revalidate();
     }
 
 //  hiển thị danh sách quyền
@@ -179,21 +215,36 @@ public class EmployeesManager extends javax.swing.JFrame {
     }
 
 //  giao diện mặc định
+    private void defaultBoxInforEm() {
+        jCreateEm.setVisible(true);
+        jCouter.setVisible(false);
+        jSaveEm.setVisible(false);
+        jBoxCouter.setVisible(false);
+        jErrorAcc.setText("");
+        jNameEm1.setText("");
+        jEmailEm.setText("");
+        jPhoneEm.setText("");
+        jPassEm.setText("");
+        jPermission.setSelectedIndex(0);
+
+    }
+
+    private void addComboBoxFillEm() {
+        jComboBoxFillEm.addItem("");
+        jComboBoxFillEm.addItem("Nhân viên vừa thêm");
+        List<GroupsPers> listGP = GPD.getAll();
+        for (GroupsPers GP : listGP) {
+            jComboBoxFillEm.addItem("Nhân viên " + GP.getName());
+        }
+    }
+
     private void interfaceDefaultEmployee() {
-        addTableEm();
+        addTableEm(ED.getEm());
         addComboboxGroupPers();
         addComboboxCouters();
 
         showPopupEm();
-        jSaveEm.setVisible(false);
-        jCreateEm.setVisible(true);
-        jCouter.setVisible(false);
-        jBoxCouter.setVisible(false);
-        jErrorAcc.setText("");
-        
-        jComboBoxFillEm.addItem("Nhân viên vừa thêm");
-        jComboBoxFillEm.addItem("Nhân viên thu ngân");
-        jComboBoxFillEm.addItem("Nhân viên quản lý");
+        jComboBoxFillEm.setSelectedIndex(0);
     }
 
     private void interfaceDefaultGroupPer() {
@@ -245,52 +296,50 @@ public class EmployeesManager extends javax.swing.JFrame {
 //  quản lý nhân viên
 //  hiển thị nhân viên lên bảng
 
-    private void addTableEm() {
+    private void addTableEm(List<Employers> listEm) {
         DefaultTableModel dtm = new DefaultTableModel();
-        List<Employers> listEm = ED.getAllEm();
+
         List<GroupsPers> listGP = GPD.getAll();
         dtm.addColumn("#");
         dtm.addColumn("Tên");
         dtm.addColumn("Email");
-        dtm.addColumn("Phone");
-        dtm.addColumn("Status");
-        dtm.addColumn("Ngày tạo");
+        dtm.addColumn("SĐT");
+        dtm.addColumn("Trạng Thái");
+        dtm.addColumn("Ngày Tạo");
         dtm.addColumn("Quyền");
         dtm.addColumn("Quầy");
         int stt = 0;
 
         for (int i = 0; i < listEm.size(); i++) {
             Employers e = listEm.get(i);
-            if (e.getStatus() != 2) {
-                stt++;
-                String namePer = "";
-                for (GroupsPers listGP1 : listGP) {
-                    if (listGP1.getId() == e.getId_per()) {
-                        namePer = listGP1.getName();
-                    }
+            stt++;
+            String namePer = "";
+            for (GroupsPers listGP1 : listGP) {
+                if (listGP1.getId() == e.getId_per()) {
+                    namePer = listGP1.getName();
                 }
-                String nameCouter = "";
-                if (e.getId_couter() == 0) {
-                    nameCouter = "not";
-                } else {
-                    for (int j = 0; j < CD.getAll().size(); j++) {
-                        Couters couter = CD.getAll().get(j);
-                        if (e.getId_couter() == couter.getId()) {
-                            nameCouter = couter.getName();
-                        }
-                    }
-                }
-                Vector v = new Vector();
-                v.add(stt);
-                v.add(e.getName());
-                v.add(e.getEmail());
-                v.add(e.getPhone());
-                v.add(e.getStatus() == 1 ? "Đang làm" : "Đã nghỉ");
-                v.add(e.getDate_created());
-                v.add(namePer);
-                v.add(nameCouter);
-                dtm.addRow(v);
             }
+            String nameCouter = "";
+            if (e.getId_couter() == 0) {
+                nameCouter = "not";
+            } else {
+                for (int j = 0; j < CD.getAll().size(); j++) {
+                    Couters couter = CD.getAll().get(j);
+                    if (e.getId_couter() == couter.getId()) {
+                        nameCouter = couter.getName();
+                    }
+                }
+            }
+            Vector v = new Vector();
+            v.add(stt);
+            v.add(e.getName());
+            v.add(e.getEmail());
+            v.add(e.getPhone());
+            v.add(e.getStatus() == 1 ? "Đang làm" : "Đã nghỉ");
+            v.add(e.getDate_created());
+            v.add(namePer);
+            v.add(nameCouter);
+            dtm.addRow(v);
         }
         jTableEm.setModel(dtm);
     }
@@ -337,10 +386,10 @@ public class EmployeesManager extends javax.swing.JFrame {
     private void setPopupInteract(int status) {
         if (status == 1) {
             jChangeSTTpopupEm.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Invisible-icon.png")));
-            jChangeSTTpopupEm.setText("Ẩn");
+            jChangeSTTpopupEm.setText("Nghỉ làm");
         } else {
             jChangeSTTpopupEm.setIcon(new ImageIcon(ListPro.class.getResource("/Commons/img/Eye-Visible-icon.png")));
-            jChangeSTTpopupEm.setText("Hiện");
+            jChangeSTTpopupEm.setText("Đi làm");
         }
 
     }
@@ -358,7 +407,7 @@ public class EmployeesManager extends javax.swing.JFrame {
                     jTableEm.clearSelection();
                 }
 
-                row_select_Em = jTableEm.getSelectedRow() + 1;
+                row_select_Em = jTableEm.getSelectedRow();
                 if (row_select_Em < 0) {
                     return;
                 }
@@ -367,12 +416,8 @@ public class EmployeesManager extends javax.swing.JFrame {
                     if (e.getButton() == MouseEvent.BUTTON3) {
                         jInteractEm.show(e.getComponent(), e.getX(), e.getY());
                     }
-                    Employers ee = ED.getAllEm().get(jTableEm.getSelectedRow());
-                    if (ee.getStatus() == 1) {
-                        setPopupInteract(1);
-                    } else {
-                        setPopupInteract(1);
-                    }
+                    Employers ee = ED.getEm().get(jTableEm.getSelectedRow());
+                    setPopupInteract(ee.getStatus());
 
                 }
             }
@@ -388,28 +433,25 @@ public class EmployeesManager extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
-        jCreateEmPopup = new javax.swing.JMenuItem();
-        jUpdateEmPoppu = new javax.swing.JMenuItem();
-        jDeleteEmPopup = new javax.swing.JMenuItem();
         jButton4 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jInteractGP = new javax.swing.JPopupMenu();
         jCreateGPPopup = new javax.swing.JMenuItem();
         jUpdateGPPopup = new javax.swing.JMenuItem();
         jInteractEm = new javax.swing.JPopupMenu();
+        jCreatePopupEm = new javax.swing.JMenuItem();
         jUpdatePopupEm = new javax.swing.JMenuItem();
         jDeletePopupEm = new javax.swing.JMenuItem();
         jChangeSTTpopupEm = new javax.swing.JMenuItem();
-        jBoxPanel = new javax.swing.JTabbedPane();
+        jBoxTabPanel = new javax.swing.JTabbedPane();
         jEm = new javax.swing.JPanel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
         CreateEm = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
         jComboBoxFillEm = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
-        jPanel27 = new javax.swing.JPanel();
+        jPrintListEm = new javax.swing.JButton();
+        jBoxListEm = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableEm = new javax.swing.JTable();
         jInforEm = new javax.swing.JPanel();
@@ -445,7 +487,7 @@ public class EmployeesManager extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
-        jPanel17 = new javax.swing.JPanel();
+        jBoxActions = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
@@ -454,28 +496,6 @@ public class EmployeesManager extends javax.swing.JFrame {
         jStatusGP = new javax.swing.JCheckBox();
         jUpdateGP = new javax.swing.JButton();
         jTestCheckBox = new javax.swing.JPanel();
-
-        jCreateEmPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-icon16.png"))); // NOI18N
-        jCreateEmPopup.setText("Thêm NV");
-        jCreateEmPopup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCreateEmPopupActionPerformed(evt);
-            }
-        });
-        jPopupMenu1.add(jCreateEmPopup);
-
-        jUpdateEmPoppu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
-        jUpdateEmPoppu.setText("Sửa");
-        jUpdateEmPoppu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jUpdateEmPoppuActionPerformed(evt);
-            }
-        });
-        jPopupMenu1.add(jUpdateEmPoppu);
-
-        jDeleteEmPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Close-icon16.png"))); // NOI18N
-        jDeleteEmPopup.setText("Xóa");
-        jPopupMenu1.add(jDeleteEmPopup);
 
         jButton4.setText("jButton4");
 
@@ -499,6 +519,15 @@ public class EmployeesManager extends javax.swing.JFrame {
         });
         jInteractGP.add(jUpdateGPPopup);
 
+        jCreatePopupEm.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/add-icon16.png"))); // NOI18N
+        jCreatePopupEm.setText("Thêm mới");
+        jCreatePopupEm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCreatePopupEmActionPerformed(evt);
+            }
+        });
+        jInteractEm.add(jCreatePopupEm);
+
         jUpdatePopupEm.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/edit-file-icon-16.png"))); // NOI18N
         jUpdatePopupEm.setText("Cập nhật");
         jUpdatePopupEm.addActionListener(new java.awt.event.ActionListener() {
@@ -518,27 +547,51 @@ public class EmployeesManager extends javax.swing.JFrame {
         jInteractEm.add(jDeletePopupEm);
 
         jChangeSTTpopupEm.setText("abc");
+        jChangeSTTpopupEm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jChangeSTTpopupEmActionPerformed(evt);
+            }
+        });
         jInteractEm.add(jChangeSTTpopupEm);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Danh mục quản lý nhân viên và nhóm quyền");
+        setPreferredSize(new java.awt.Dimension(789, 696));
 
-        jBoxPanel.setBackground(new java.awt.Color(255, 0, 0));
+        jBoxTabPanel.setBackground(new java.awt.Color(255, 0, 0));
+        jBoxTabPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jBoxTabPanelMouseClicked(evt);
+            }
+        });
+
+        jEm.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jEmMouseClicked(evt);
+            }
+        });
 
         jLayeredPane1.setLayout(new java.awt.CardLayout());
 
         CreateEm.setAutoscrolls(true);
+        CreateEm.setPreferredSize(new java.awt.Dimension(777, 662));
 
         jPanel26.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel22.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel22.setText("Lọc");
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/print-icon.png"))); // NOI18N
-        jButton1.setText("In Danh Sách");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jComboBoxFillEm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jComboBoxFillEmActionPerformed(evt);
+            }
+        });
+
+        jPrintListEm.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/print-icon.png"))); // NOI18N
+        jPrintListEm.setText("In Danh Sách");
+        jPrintListEm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPrintListEmActionPerformed(evt);
             }
         });
 
@@ -551,8 +604,8 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addComponent(jComboBoxFillEm, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 368, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 371, Short.MAX_VALUE)
+                .addComponent(jPrintListEm)
                 .addContainerGap())
         );
         jPanel26Layout.setVerticalGroup(
@@ -562,11 +615,11 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addGroup(jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboBoxFillEm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE))
+                    .addComponent(jPrintListEm, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE))
                 .addGap(7, 7, 7))
         );
 
-        jPanel27.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Danh sách nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        jBoxListEm.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Danh sách nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
 
         jTableEm.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -581,20 +634,20 @@ public class EmployeesManager extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(jTableEm);
 
-        javax.swing.GroupLayout jPanel27Layout = new javax.swing.GroupLayout(jPanel27);
-        jPanel27.setLayout(jPanel27Layout);
-        jPanel27Layout.setHorizontalGroup(
-            jPanel27Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel27Layout.createSequentialGroup()
+        javax.swing.GroupLayout jBoxListEmLayout = new javax.swing.GroupLayout(jBoxListEm);
+        jBoxListEm.setLayout(jBoxListEmLayout);
+        jBoxListEmLayout.setHorizontalGroup(
+            jBoxListEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBoxListEmLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane3)
                 .addContainerGap())
         );
-        jPanel27Layout.setVerticalGroup(
-            jPanel27Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel27Layout.createSequentialGroup()
+        jBoxListEmLayout.setVerticalGroup(
+            jBoxListEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBoxListEmLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -608,16 +661,15 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jNameEm1)
-                .addContainerGap())
+                .addComponent(jNameEm1))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jNameEm1, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jNameEm1, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -628,16 +680,15 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jEmailEm, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jEmailEm))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jEmailEm, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jEmailEm, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -648,28 +699,26 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPhoneEm)
-                .addContainerGap())
+                .addComponent(jPhoneEm, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPhoneEm, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jPhoneEm, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel8Layout.setVerticalGroup(
@@ -680,15 +729,14 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 108, Short.MAX_VALUE)
+            .addGap(0, 152, Short.MAX_VALUE)
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -703,16 +751,16 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(2, 2, 2)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPassEm)
-                .addContainerGap())
+                .addComponent(jPassEm))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPassEm, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jPassEm, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -730,17 +778,17 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPermission, 0, 182, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPermission, 0, 192, Short.MAX_VALUE))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                .addComponent(jPermission, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel13Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPermission, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
         );
 
         jBoxCouter.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -755,14 +803,13 @@ public class EmployeesManager extends javax.swing.JFrame {
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addComponent(jBoxCouter, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCouter, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jCouter, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jBoxCouter, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                .addComponent(jCouter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jBoxCouter)
+                .addComponent(jCouter, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -770,28 +817,25 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
+                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -818,7 +862,7 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addComponent(jCreateEm)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSaveEm)
-                .addContainerGap(222, Short.MAX_VALUE))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -837,27 +881,29 @@ public class EmployeesManager extends javax.swing.JFrame {
         jInforEmLayout.setHorizontalGroup(
             jInforEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jInforEmLayout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jErrorAcc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(jInforEmLayout.createSequentialGroup()
-                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(jInforEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jInforEmLayout.createSequentialGroup()
+                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jInforEmLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jErrorAcc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jInforEmLayout.setVerticalGroup(
             jInforEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jInforEmLayout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addGroup(jInforEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jInforEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jErrorAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jInforEmLayout.createSequentialGroup()
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jErrorAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout CreateEmLayout = new javax.swing.GroupLayout(CreateEm);
@@ -868,7 +914,7 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(CreateEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel26, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel27, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jBoxListEm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jInforEm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         CreateEmLayout.setVerticalGroup(
@@ -878,7 +924,7 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel27, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBoxListEm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -896,10 +942,10 @@ public class EmployeesManager extends javax.swing.JFrame {
             jEmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jEmLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLayeredPane1))
+                .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE))
         );
 
-        jBoxPanel.addTab("Nhân viên", jEm);
+        jBoxTabPanel.addTab("Nhân viên", jEm);
 
         jTableGP.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -949,7 +995,7 @@ public class EmployeesManager extends javax.swing.JFrame {
                 .addContainerGap(35, Short.MAX_VALUE))
         );
 
-        jPanel17.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thêm nhóm quyền cùng chức năng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        jBoxActions.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thêm nhóm quyền cùng chức năng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
 
         jPanel18.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1024,20 +1070,20 @@ public class EmployeesManager extends javax.swing.JFrame {
         jTestCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTestCheckBox.setLayout(new java.awt.GridLayout(2, 0, 1, 0));
 
-        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
-        jPanel17.setLayout(jPanel17Layout);
-        jPanel17Layout.setHorizontalGroup(
-            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel17Layout.createSequentialGroup()
+        javax.swing.GroupLayout jBoxActionsLayout = new javax.swing.GroupLayout(jBoxActions);
+        jBoxActions.setLayout(jBoxActionsLayout);
+        jBoxActionsLayout.setHorizontalGroup(
+            jBoxActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBoxActionsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jBoxActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel18, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTestCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel17Layout.setVerticalGroup(
-            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel17Layout.createSequentialGroup()
+        jBoxActionsLayout.setVerticalGroup(
+            jBoxActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBoxActionsLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1051,7 +1097,7 @@ public class EmployeesManager extends javax.swing.JFrame {
             .addGroup(jPerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jBoxActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPerLayout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1066,41 +1112,25 @@ public class EmployeesManager extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jBoxActions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jBoxPanel.addTab("Nhóm Quyền", jPer);
+        jBoxTabPanel.addTab("Nhóm Quyền", jPer);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jBoxPanel)
+            .addComponent(jBoxTabPanel)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jBoxPanel, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jBoxTabPanel, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-// tạo nhóm quyền
-    private void jCreatePerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreatePerActionPerformed
-        String name = jNameGP.getText();
-        GroupsPers gp = new GroupsPers(name, 1);
-        if (GPD.createGroupsPer(gp)) {
-            int id_per = GPD.getAll().get(GPD.getAll().size() - 1).getId();
-            //        thêm quyền theo hành động
-            for (JCheckBox listJCheckBox1 : listJCheckBox) {
-                if (listJCheckBox1.isSelected()) {
-                    PAD.createPerAcc(new PersActions(id_per, Integer.valueOf(listJCheckBox1.getName())));
-                }
-            }
-            interfaceDefaultGroupPer();
-        }
-
-    }//GEN-LAST:event_jCreatePerActionPerformed
 
 //hiển thị dữ liệu để cập nhật nhóm quyền
     private void jUpdateGPPopupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateGPPopupActionPerformed
@@ -1128,123 +1158,6 @@ public class EmployeesManager extends javax.swing.JFrame {
             jStatusGP.setSelected(false);
         }
     }//GEN-LAST:event_jUpdateGPPopupActionPerformed
-//cập nhật nhóm quyền
-    private void jUpdateGPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateGPActionPerformed
-//        cập nhật thông tin quyền
-        GroupsPers selectedGP = GPD.getAll().get(row_GP_selected);
-        String name = jNameGP.getText();
-        int status;
-        if (jStatusGP.isSelected()) {
-            status = 1;
-        } else {
-            status = 0;
-        }
-        GroupsPers gp = new GroupsPers(selectedGP.getId(), name, "", status);
-        GPD.updateGroupsPer(gp);
-
-//      danh sách nhóm quyền theo id quyền 
-        List<PersActions> listPerAction = PAD.listPerAccById(selectedGP.getId());
-//      Danh sách các phần tử đã chọn giống với csdl
-        List<Integer> lisSimilar = new ArrayList<>();
-//      danh sách các ô đã chọn khác nhau
-        List<JCheckBox> listDifferentCheckBox = new ArrayList<>();
-//      danh sách các phần tử khác nhau trên csdl
-        List<PersActions> listDifferentPA = PAD.listPerAccById(selectedGP.getId());
-//      danh sách các phần từ khác nhau(ô checkbox và scsdl)
-        List<JCheckBox> listDifferent = new ArrayList<>();
-
-//      lấy các id act giống nhau
-        for (JCheckBox listCB : listJCheckBox) {
-            if (listCB.isSelected()) {
-                for (PersActions listPerAction1 : listPerAction) {
-                    if (Integer.parseInt(listCB.getName()) == listPerAction1.getId_act()) {
-                        lisSimilar.add(listPerAction1.getId_act());
-                        System.out.println("các phần tử giống nhau !" + listPerAction1.getId_act());
-                    }
-                }
-            }
-        }
-        // lấy các ô đã chọn và lấy các đối tượng khác nhau
-        for (JCheckBox listCB : listJCheckBox) {
-            if (listCB.isSelected()) {
-                listDifferentCheckBox.add(listCB);
-                listDifferent.add(listCB);
-            } else {
-                for (int i = 0; i < listPerAction.size(); i++) {
-                    PersActions per = listPerAction.get(i);
-                    if (per.getId_act() == Integer.parseInt(listCB.getName())) {
-                        listDifferent.add(listCB);
-                    }
-                }
-            }
-        }
-        //      lọc các phần tử giống nhau(với csdl) trong ô 
-        for (int i = 0; i < listDifferentCheckBox.size(); i++) {
-            for (int j = 0; j < lisSimilar.size(); j++) {
-                if (lisSimilar.get(j) == Integer.parseInt(listDifferentCheckBox.get(i).getName())) {
-                    listDifferentCheckBox.remove(i);
-                }
-            }
-
-        }
-        for (int i = 0; i < listDifferent.size(); i++) {
-            for (int j = 0; j < lisSimilar.size(); j++) {
-                if (lisSimilar.get(j) == Integer.parseInt(listDifferent.get(i).getName())) {
-                    listDifferent.remove(i);
-                }
-            }
-
-        }
-        for (int i = 0; i < listDifferent.size(); i++) {
-            JCheckBox get = listDifferent.get(i);
-            System.out.println("Các phẩn tử khác nhau " + get.getName());
-
-        }
-        for (JCheckBox checked : listDifferentCheckBox) {
-            System.out.println("phần tử của ô khác nhau : " + checked.getName());
-        }
-
-        int cout = 0;
-//      lấy các phần tử khác nhau trên csdl
-        for (int i = 0; i < listPerAction.size(); i++) {
-            PersActions PA = listPerAction.get(i);
-            for (Integer id_act : lisSimilar) {
-                if (PA.getId_act() == id_act) {
-                    listDifferentPA.remove(i - cout);
-                    cout++;
-                }
-            }
-        }
-
-        for (int i = 0; i < listDifferentPA.size(); i++) {
-            PersActions per = listDifferentPA.get(i);
-            System.out.println("các phần tử trên csdl khác nhau : " + per.getId_act());
-        }
-//      Thục hiện thay đổi csdl
-        for (int i = 0; i < listDifferent.size(); i++) {
-            try {
-                JCheckBox checkFiltered = listDifferentCheckBox.get(i);
-                try {
-//                  thực hiện cập nhật
-                    PAD.updatePerAcc(selectedGP.getId(), listDifferentPA.get(i).getId_act(), Integer.parseInt(checkFiltered.getName()));
-
-                } catch (Exception e) {
-//                  thực hiện thêm mới
-                    PAD.createPerAcc(new PersActions(selectedGP.getId(), Integer.parseInt(checkFiltered.getName())));
-                }
-            } catch (Exception e) {
-
-                try {
-//                 thực hiện xóa khi bị tràn mảng listDifferentCheckBox
-                    PAD.deletePerAcc(selectedGP.getId(), listDifferentPA.get(i).getId_act());
-                } catch (Exception ex) {
-//                 trương trình thưc hiện cập nhật xong
-                }
-            }
-        }
-//      quay về giao diện mặc định
-        interfaceDefaultGroupPer();
-    }//GEN-LAST:event_jUpdateGPActionPerformed
 
 //hiển thị from mặc định
     private void jCreateGPPopupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreateGPPopupActionPerformed
@@ -1277,16 +1190,10 @@ public class EmployeesManager extends javax.swing.JFrame {
         }
 
     }
-    private void jCreateEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreateEmActionPerformed
-        if (selectInput() != null) {
-            ED.createEm(selectInput());
-            interfaceDefaultEmployee();
-        }
-
-    }//GEN-LAST:event_jCreateEmActionPerformed
-
     private void jUpdatePopupEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdatePopupEmActionPerformed
-        Employers e = ED.getAllEm().get(row_select_Em);
+        jSaveEm.setVisible(true);
+        jCreateEm.setVisible(false);
+        Employers e = ED.getEm().get(row_select_Em);
         jNameEm1.setText(e.getName());
         jEmailEm.setText(e.getEmail());
         jPhoneEm.setText(e.getPhone());
@@ -1309,29 +1216,279 @@ public class EmployeesManager extends javax.swing.JFrame {
         jPermission.setSelectedIndex(row);
     }//GEN-LAST:event_jUpdatePopupEmActionPerformed
 
+    private void jDeletePopupEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeletePopupEmActionPerformed
+        Employers e = ED.getEm().get(row_select_Em);
+        int check = JOptionPane.showConfirmDialog(rootPane, "Bạn có chác muốn xóa Nhân viên này ?", "Xác nhận hành động", JOptionPane.YES_OPTION, JOptionPane.CANCEL_OPTION);
+        if (check == 0) {
+            if (ED.deleteEm(e.getId())) {
+                interfaceDefaultEmployee();
+                defaultBoxInforEm();
+            }
+        }
+    }//GEN-LAST:event_jDeletePopupEmActionPerformed
+
+    private void jCreatePopupEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreatePopupEmActionPerformed
+        defaultBoxInforEm();
+    }//GEN-LAST:event_jCreatePopupEmActionPerformed
+
+    private void jChangeSTTpopupEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jChangeSTTpopupEmActionPerformed
+        Employers e = ED.getEm().get(row_select_Em);
+        int confim = JOptionPane.showConfirmDialog(rootPane, "Bạn có chắc muốn thay đổi trạng thái nhân viên này ?", "Xác nhận hành động", JOptionPane.YES_OPTION, JOptionPane.CANCEL_OPTION);
+        if (confim == 0) {
+            if (ED.changeSTT(e.getId(), e.getStatus())) {
+                interfaceDefaultEmployee();
+                defaultBoxInforEm();
+            }
+        }
+    }//GEN-LAST:event_jChangeSTTpopupEmActionPerformed
+
+//cập nhật nhóm quyền
+    private void jUpdateGPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateGPActionPerformed
+        //        cập nhật thông tin quyền
+        GroupsPers selectedGP = GPD.getAll().get(row_GP_selected);
+        String name = jNameGP.getText();
+        int status;
+        if (jStatusGP.isSelected()) {
+            status = 1;
+        } else {
+            status = 0;
+        }
+        GroupsPers gp = new GroupsPers(selectedGP.getId(), name, "", status);
+        GPD.updateGroupsPer(gp);
+
+        //      danh sách nhóm quyền theo id quyền
+        List<PersActions> listPerAction = PAD.listPerAccById(selectedGP.getId());
+        //      Danh sách các phần tử đã chọn giống với csdl
+        List<Integer> lisSimilar = new ArrayList<>();
+        //      danh sách các ô đã chọn khác nhau
+        List<JCheckBox> listDifferentCheckBox = new ArrayList<>();
+        //      danh sách các phần tử khác nhau trên csdl
+        List<PersActions> listDifferentPA = PAD.listPerAccById(selectedGP.getId());
+        //      danh sách các phần từ khác nhau(ô checkbox và scsdl)
+        List<JCheckBox> listDifferent = new ArrayList<>();
+
+        //      lấy các id act giống nhau
+        for (JCheckBox listCB : listJCheckBox) {
+            if (listCB.isSelected()) {
+                for (PersActions listPerAction1 : listPerAction) {
+                    if (Integer.parseInt(listCB.getName()) == listPerAction1.getId_act()) {
+                        lisSimilar.add(listPerAction1.getId_act());
+                        System.out.println("các phần tử giống nhau !" + listPerAction1.getId_act());
+                    }
+                }
+            }
+        }
+        // lấy các ô đã chọn và lấy các đối tượng khác nhau
+        for (JCheckBox listCB : listJCheckBox) {
+            if (listCB.isSelected()) {
+                listDifferentCheckBox.add(listCB);
+                listDifferent.add(listCB);
+            } else {
+                for (int i = 0; i < listPerAction.size(); i++) {
+                    PersActions per = listPerAction.get(i);
+                    if (per.getId_act() == Integer.parseInt(listCB.getName())) {
+                        listDifferent.add(listCB);
+                    }
+                }
+            }
+        }
+        //      lọc các phần tử giống nhau(với csdl) trong ô
+        for (int i = 0; i < listDifferentCheckBox.size(); i++) {
+            for (int j = 0; j < lisSimilar.size(); j++) {
+                if (lisSimilar.get(j) == Integer.parseInt(listDifferentCheckBox.get(i).getName())) {
+                    listDifferentCheckBox.remove(i);
+                }
+            }
+
+        }
+        for (int i = 0; i < listDifferent.size(); i++) {
+            for (int j = 0; j < lisSimilar.size(); j++) {
+                if (lisSimilar.get(j) == Integer.parseInt(listDifferent.get(i).getName())) {
+                    listDifferent.remove(i);
+                }
+            }
+
+        }
+        for (int i = 0; i < listDifferent.size(); i++) {
+            JCheckBox get = listDifferent.get(i);
+            System.out.println("Các phẩn tử khác nhau " + get.getName());
+
+        }
+        for (JCheckBox checked : listDifferentCheckBox) {
+            System.out.println("phần tử của ô khác nhau : " + checked.getName());
+        }
+
+        int cout = 0;
+        //      lấy các phần tử khác nhau trên csdl
+        for (int i = 0; i < listPerAction.size(); i++) {
+            PersActions PA = listPerAction.get(i);
+            for (Integer id_act : lisSimilar) {
+                if (PA.getId_act() == id_act) {
+                    listDifferentPA.remove(i - cout);
+                    cout++;
+                }
+            }
+        }
+
+        for (int i = 0; i < listDifferentPA.size(); i++) {
+            PersActions per = listDifferentPA.get(i);
+            System.out.println("các phần tử trên csdl khác nhau : " + per.getId_act());
+        }
+        //      Thục hiện thay đổi csdl
+        for (int i = 0; i < listDifferent.size(); i++) {
+            try {
+                JCheckBox checkFiltered = listDifferentCheckBox.get(i);
+                try {
+                    //                  thực hiện cập nhật
+                    PAD.updatePerAcc(selectedGP.getId(), listDifferentPA.get(i).getId_act(), Integer.parseInt(checkFiltered.getName()));
+
+                } catch (Exception e) {
+                    //                  thực hiện thêm mới
+                    PAD.createPerAcc(new PersActions(selectedGP.getId(), Integer.parseInt(checkFiltered.getName())));
+                }
+            } catch (Exception e) {
+
+                try {
+                    //                 thực hiện xóa khi bị tràn mảng listDifferentCheckBox
+                    PAD.deletePerAcc(selectedGP.getId(), listDifferentPA.get(i).getId_act());
+                } catch (Exception ex) {
+                    //                 trương trình thưc hiện cập nhật xong
+                }
+            }
+        }
+        //      quay về giao diện mặc định
+        interfaceDefaultGroupPer();
+    }//GEN-LAST:event_jUpdateGPActionPerformed
+
+// tạo nhóm quyền
+    private void jCreatePerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreatePerActionPerformed
+        String name = jNameGP.getText();
+        GroupsPers gp = new GroupsPers(name, 1);
+        if (GPD.createGroupsPer(gp)) {
+            int id_per = GPD.getAll().get(GPD.getAll().size() - 1).getId();
+            //        thêm quyền theo hành động
+            for (JCheckBox listJCheckBox1 : listJCheckBox) {
+                if (listJCheckBox1.isSelected()) {
+                    PAD.createPerAcc(new PersActions(id_per, Integer.valueOf(listJCheckBox1.getName())));
+                }
+            }
+            interfaceDefaultGroupPer();
+        }
+    }//GEN-LAST:event_jCreatePerActionPerformed
+
     private void jSaveEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveEmActionPerformed
 
     }//GEN-LAST:event_jSaveEmActionPerformed
+
+    private void jCreateEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreateEmActionPerformed
+        if (selectInput() != null) {
+            if (ED.createEm(selectInput())) {
+                interfaceDefaultEmployee();
+                defaultBoxInforEm();
+            }
+        }
+    }//GEN-LAST:event_jCreateEmActionPerformed
 
     private void jPermissionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPermissionActionPerformed
 
     }//GEN-LAST:event_jPermissionActionPerformed
 
-    private void jUpdateEmPoppuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateEmPoppuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jUpdateEmPoppuActionPerformed
+    private void jPrintListEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPrintListEmActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        File file = new File("E:/");
+        fileChooser.setSelectedFile(file);
+        fileChooser.showSaveDialog(jPrintListEm);
 
-    private void jCreateEmPopupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreateEmPopupActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCreateEmPopupActionPerformed
+        String pathNew = String.valueOf(fileChooser.getSelectedFile());
+        try {
+            SpreadsheetInfo.setLicense("FREE-LIMITED-KEY");
+            ExcelFile excel = new ExcelFile();
+            ExcelWorksheet workSheet = excel.addWorksheet("Tables");
+            if (file.exists()) {
+                file.delete();
+                workSheet.getCell(0, 0).setValue("#");
+                workSheet.getCell(0, 1).setValue("Tên");
+                workSheet.getCell(0, 2).setValue("Email");
+                workSheet.getCell(0, 3).setValue("SĐT");
+                workSheet.getCell(0, 4).setValue("Trạng Thái");
+                workSheet.getCell(0, 5).setValue("Ngày Tạo");
+                workSheet.getCell(0, 6).setValue("Quyền");
+                workSheet.getCell(0, 7).setValue("Quầy");
 
-    private void jDeletePopupEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeletePopupEmActionPerformed
+                List<Employers> lisEm = ED.getEm();
+                excel.save(pathNew);
 
-    }//GEN-LAST:event_jDeletePopupEmActionPerformed
+                int count = 0;
+                for (int i = 1; i <= lisEm.size(); i++) {
+                    Employers e = lisEm.get(i - 1);
+                    count++;
+                    workSheet.getCell(i, 0).setValue(count);
+                    for (int j = 0; j < 6; j++) {
+                        workSheet.getCell(i, 1).setValue(e.getName());
+                        workSheet.getCell(i, 2).setValue(e.getEmail());
+                        workSheet.getCell(i, 3).setValue(e.getPhone());
+                        workSheet.getCell(i, 4).setValue(e.getStatus());
+                        workSheet.getCell(i, 5).setValue(e.getDate_created());
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+//                      lấy tên nhóm quyền
+                        String namePer = "";
+                        for (GroupsPers listGP1 : GPD.getAll()) {
+                            if (listGP1.getId() == e.getId_per()) {
+                                namePer = listGP1.getName();
+                            }
+                        }
+//                      lấy tên quầy nếu có
+                        String nameCouter = "";
+                        if (e.getId_couter() == 0) {
+                            nameCouter = "not";
+                        } else {
+                            for (int z = 0; z < CD.getAll().size(); z++) {
+                                Couters couter = CD.getAll().get(z);
+                                if (e.getId_couter() == couter.getId()) {
+                                    nameCouter = couter.getName();
+                                }
+                            }
+                        }
+                        workSheet.getCell(i, 6).setValue(namePer);
+                        workSheet.getCell(i, 7).setValue(nameCouter);
+
+                    }
+                }
+                excel.save(pathNew);
+            }
+            JOptionPane.showMessageDialog(rootPane, "Lưu file thành công !");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(rootPane, "File không tồn tại ! Xin thử lại !");
+            System.out.println(ex.toString());
+        }
+    }//GEN-LAST:event_jPrintListEmActionPerformed
+
+    private void jComboBoxFillEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxFillEmActionPerformed
+        int rowFillListEm = jComboBoxFillEm.getSelectedIndex();
+        if (rowFillListEm == 1) {
+            addTableEm(ED.listEmInNewDate());
+        } else if (rowFillListEm > 1) {
+            GroupsPers GP = GPD.getAll().get(rowFillListEm - 2);
+            addTableEm(ED.listEmByGP(GP.getId()));
+        }
+    }//GEN-LAST:event_jComboBoxFillEmActionPerformed
+
+    private void jEmMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmMouseClicked
+
+    }//GEN-LAST:event_jEmMouseClicked
+
+    private void jBoxTabPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBoxTabPanelMouseClicked
+//        if (jPer.isShowing()) {
+//            System.out.println("ok1");
+//        } else {
+//            System.out.println("false1");
+//        }
+//        if (jEm.isShowing()) {
+//            System.out.println("ok2");
+//        } else {
+//            System.out.println("false2");
+//        }
+    }//GEN-LAST:event_jBoxTabPanelMouseClicked
 //
     int row_GP_selected = 0;
 
@@ -1398,18 +1555,18 @@ public class EmployeesManager extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CreateEm;
+    private javax.swing.JPanel jBoxActions;
     private javax.swing.JLabel jBoxCouter;
-    private javax.swing.JTabbedPane jBoxPanel;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JPanel jBoxListEm;
+    private javax.swing.JTabbedPane jBoxTabPanel;
     private javax.swing.JButton jButton4;
     private javax.swing.JMenuItem jChangeSTTpopupEm;
     private javax.swing.JComboBox jComboBoxFillEm;
     private javax.swing.JComboBox jCouter;
     private javax.swing.JButton jCreateEm;
-    private javax.swing.JMenuItem jCreateEmPopup;
     private javax.swing.JMenuItem jCreateGPPopup;
     private javax.swing.JButton jCreatePer;
-    private javax.swing.JMenuItem jDeleteEmPopup;
+    private javax.swing.JMenuItem jCreatePopupEm;
     private javax.swing.JMenuItem jDeletePopupEm;
     private javax.swing.JPanel jEm;
     private javax.swing.JTextField jEmailEm;
@@ -1437,11 +1594,9 @@ public class EmployeesManager extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -1451,7 +1606,7 @@ public class EmployeesManager extends javax.swing.JFrame {
     private javax.swing.JPanel jPer;
     private javax.swing.JComboBox jPermission;
     private javax.swing.JTextField jPhoneEm;
-    private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JButton jPrintListEm;
     private javax.swing.JButton jSaveEm;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1459,7 +1614,6 @@ public class EmployeesManager extends javax.swing.JFrame {
     private javax.swing.JTable jTableEm;
     private javax.swing.JTable jTableGP;
     private javax.swing.JPanel jTestCheckBox;
-    private javax.swing.JMenuItem jUpdateEmPoppu;
     private javax.swing.JButton jUpdateGP;
     private javax.swing.JMenuItem jUpdateGPPopup;
     private javax.swing.JMenuItem jUpdatePopupEm;

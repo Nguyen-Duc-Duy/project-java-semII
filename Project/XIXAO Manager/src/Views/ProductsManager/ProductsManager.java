@@ -49,14 +49,16 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
         PD = new ProductDAO(connect);
 
         initComponents();
+        setLocationRelativeTo(null);
+
         new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
 
         RolesView();
         RolesActions();
 //        set layer mặc định
-        listPro = new ListPro(connect, this,em);
+        listPro = new ListPro(connect, this, em);
         setLayerPro(listPro);
-        CategorysManager catForm = new CategorysManager(connect,em);
+        CategorysManager catForm = new CategorysManager(connect, em);
         setlayerOther(catForm);
         setDefaultToolbar();
         setDefaultCloseOperation(ProductsManager.DISPOSE_ON_CLOSE);
@@ -130,7 +132,7 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
                 }
             }
         }
-        
+
     }
 
     /**
@@ -383,7 +385,7 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
     }// </editor-fold>//GEN-END:initComponents
 
     private void jListProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jListProActionPerformed
-        ListPro listPro = new ListPro(connect, this,em);
+        ListPro listPro = new ListPro(connect, this, em);
         setLayerPro(listPro);
         setDefaultToolbar();
     }//GEN-LAST:event_jListProActionPerformed
@@ -399,7 +401,7 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
         if (check == 0) {
             PD.deletePro(id);
         };
-        setLayerPro(new ListPro(connect, this,em));
+        setLayerPro(new ListPro(connect, this, em));
     }
     private void jDeleteProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteProActionPerformed
         deletePro(idProSelected);
@@ -466,12 +468,12 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
     }//GEN-LAST:event_jPrintProActionPerformed
 
     private void jCategorysToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCategorysToolActionPerformed
-        CategorysManager catForm = new CategorysManager(connect,em);
+        CategorysManager catForm = new CategorysManager(connect, em);
         setlayerOther(catForm);
     }//GEN-LAST:event_jCategorysToolActionPerformed
 
     private void jUnitsToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUnitsToolActionPerformed
-        UnitsManager unitForm = new UnitsManager(connect,em);
+        UnitsManager unitForm = new UnitsManager(connect, em);
         setlayerOther(unitForm);
     }//GEN-LAST:event_jUnitsToolActionPerformed
     @Override

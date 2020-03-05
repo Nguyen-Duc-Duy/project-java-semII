@@ -2,6 +2,7 @@
 GO
 USE XiXaoManger
 GO
+
 -- bảng nhân viên
 CREATE TABLE employers
 (
@@ -168,10 +169,9 @@ ADD id_per INT FOREIGN KEY REFERENCES groupsPers(id)
 
 
 -- thêm giá trị cho quyền admin tổng
-INSERT INTO groupsPers(name,date_created) VALUES
-(N'Chủ hệ thống',GETDATE())
-SELECT * FROM employers
-UPDATE employers SET id_per = 1
+insert into employers(name,email,pass,[status]) values
+(N'Quản lý hệ thống','programbuilder@gmail.com',1,2)
+
 -- thêm giá trị cho view và actions
 INSERT INTO [views](name,code,date_created) VALUES
 (N'Sản phẩm','Pro',GETDATE()),
@@ -244,7 +244,7 @@ from products p
 join categorys c
 on p.id_cat = c.id
 where c.status = 1
-
+	
 	-- tạo
 CREATE PROC createPro
 	@name NVARCHAR(32) ,
@@ -500,10 +500,14 @@ UPDATE groupsPers SET [status] = @status WHERE id = @id
 
 
 -- TẠO THỦ TỤC QUẢN LÝ NHÂN VIÊN
-	-- lất tất cả nhân viên
+	-- lất tất cả bản ghi
 create proc selectAttEm
 as
 select * from employers
+	-- lấy các nhân viên
+create proc selectEm
+as
+select * from employers where [status] = 0 or [status] = 1
 	-- thêm mới
 create proc createEm
 @name nvarchar(32),@email varchar(120),@pass varchar(120),@phone varchar(10),@id_couter int null,@id_per int
@@ -533,6 +537,19 @@ CREATE PROC selectEmById
 AS
 SELECT * FROM employers WHERE id = @id
 
+	--Danh sách nhân viên vừa thêm(trong 1 ngày sớm nhất)
+create proc selectEmInNewDate
+as
+declare @dateOldEm varchar(10)
+set @dateOldEm = convert(varchar,(select top(1) e.date_created from employers e where [status] = 1 or [status] = 0 order by date_created DESC), 23)
+select * from employers
+where date_created between concat(@dateOldEm,' 00:00:00') and concat(@dateOldEm,' 23:59:59')
+
+	--Danh sách nhân viên theo nhóm quyền
+create proc selectEmByGP
+@id_per int
+as
+select * from employers where id_per = @id_per
 
 
 -- THỦ TỤC CỦA VIEWS

@@ -14,9 +14,12 @@ import java.util.List;
  */
 public interface IEmployees {
     public List<Employers> getAllEm();
-    public void createEm(Employers e);
-    public void updateEm(Employers e);
-    public void changeSTT(int id,int status);
-    public void deleteEm(int id);
+    public List<Employers> getEm();
+    public boolean createEm(Employers e);
+    public boolean updateEm(Employers e);
+    public boolean changeSTT(int id,int status);
+    public boolean deleteEm(int id);
     public Employers getEmById(int id);
+    public List<Employers> listEmInNewDate();
+    public List<Employers> listEmByGP(int id_per);
 }

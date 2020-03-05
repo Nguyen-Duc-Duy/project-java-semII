@@ -7,6 +7,7 @@ package Views.PayManger;
 
 import Controllers.DAO.CoutersDAO;
 import Controllers.DAO.EmployeesDAO;
+import Controllers.DAO.GroupsPerDAO;
 import Controllers.DAO.OrderDetailDAO;
 import Controllers.DAO.OrdersDAO;
 import Controllers.DAO.ProductDAO;
@@ -49,18 +50,23 @@ public class PaysManager extends javax.swing.JFrame {
     OrderDetailDAO OD;
     CoutersDAO CD;
     EmployeesDAO ED;
-    int id_em;
-
-    public PaysManager(Connection c, int id_employee) {
+    Employers em;
+    GroupsPerDAO GPD;
+    public PaysManager(Connection c, Employers em) {
         this.con = c;
-        this.id_em = id_employee;
+        this.em = em;
         PD = new ProductDAO(c);
         UD = new UnitDAO(c);
         O = new OrdersDAO(c);
         OD = new OrderDetailDAO(c);
         CD = new CoutersDAO(c);
         ED = new EmployeesDAO(c);
+        GPD = new GroupsPerDAO(c);
+        
         initComponents();
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(PaysManager.DISPOSE_ON_CLOSE);
+        
         addComoboBoxFillOrders();
         setDefaultInterface();
         setlayerOrder(jListOrder);
@@ -68,6 +74,26 @@ public class PaysManager extends javax.swing.JFrame {
         showInterractOrderDetail();
         addTableCouter();
         showPopupOrders();
+        
+        
+    }
+//    phân quyền
+//    Giao diện
+    private void RolesViews(){
+        jBoxPays.remove(jTabPays);
+        jBoxPays.remove(jTabCouters);
+        jBoxPays.remove(jTabAllOrders);
+        if (em.getStatus() == 2) {
+            jBoxPays.add(jTabPays);
+            jBoxPays.add(jTabCouters);
+            jBoxPays.add(jTabAllOrders);
+        } else if(em.getStatus() == 0 ||  em.getStatus() == 1){
+            List<String> listViewsOfEm = GPD.listPerActByEm(em.getId());
+        }else {
+            JOptionPane.showMessageDialog(null, "Lỗi hệ thống xin thử lại sau !");
+        }
+        
+        
     }
 //    
 
@@ -121,8 +147,8 @@ public class PaysManager extends javax.swing.JFrame {
         jShowDetailOrder = new javax.swing.JMenuItem();
         jInteractOrdersByEm = new javax.swing.JPopupMenu();
         jShowDetailOrderByEm = new javax.swing.JMenuItem();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        jBoxPays = new javax.swing.JTabbedPane();
+        jTabPays = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -194,7 +220,7 @@ public class PaysManager extends javax.swing.JFrame {
         jUpdateOD = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
+        jTabCouters = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -210,7 +236,7 @@ public class PaysManager extends javax.swing.JFrame {
         jPanel35 = new javax.swing.JPanel();
         jCreateCouter = new javax.swing.JButton();
         jSaveCouter = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
+        jTabAllOrders = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         jTableOrders = new javax.swing.JTable();
         jPanel47 = new javax.swing.JPanel();
@@ -955,22 +981,22 @@ public class PaysManager extends javax.swing.JFrame {
             .addComponent(jLayerOrders)
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jTabPaysLayout = new javax.swing.GroupLayout(jTabPays);
+        jTabPays.setLayout(jTabPaysLayout);
+        jTabPaysLayout.setHorizontalGroup(
+            jTabPaysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        jTabPaysLayout.setVerticalGroup(
+            jTabPaysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jTabPaysLayout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Thanh toán đơn", jPanel1);
+        jBoxPays.addTab("Thanh toán đơn", jTabPays);
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Dánh sách quầy thu ngân", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
 
@@ -1131,18 +1157,18 @@ public class PaysManager extends javax.swing.JFrame {
             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jTabCoutersLayout = new javax.swing.GroupLayout(jTabCouters);
+        jTabCouters.setLayout(jTabCoutersLayout);
+        jTabCoutersLayout.setHorizontalGroup(
+            jTabCoutersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jTabCoutersLayout.setVerticalGroup(
+            jTabCoutersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("Quầy thanh toán", jPanel2);
+        jBoxPays.addTab("Quầy thanh toán", jTabCouters);
 
         jTableOrders.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1177,20 +1203,20 @@ public class PaysManager extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout jTabAllOrdersLayout = new javax.swing.GroupLayout(jTabAllOrders);
+        jTabAllOrders.setLayout(jTabAllOrdersLayout);
+        jTabAllOrdersLayout.setHorizontalGroup(
+            jTabAllOrdersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jTabAllOrdersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jTabAllOrdersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 765, Short.MAX_VALUE)
                     .addComponent(jPanel47, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        jTabAllOrdersLayout.setVerticalGroup(
+            jTabAllOrdersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jTabAllOrdersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel47, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1198,17 +1224,17 @@ public class PaysManager extends javax.swing.JFrame {
                 .addContainerGap(139, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Danh sách đơn hàng", jPanel7);
+        jBoxPays.addTab("Danh sách đơn hàng", jTabAllOrders);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jBoxPays)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jBoxPays)
         );
 
         pack();
@@ -1255,7 +1281,7 @@ public class PaysManager extends javax.swing.JFrame {
 
 //  hiển thị danh sách đơn hàng theo nhân viên
     private void addTableOrderByEm() {
-        List<Orders> listOrderOfEm = O.getAllByEm(id_em);
+        List<Orders> listOrderOfEm = O.getAllByEm(em.getId());
         DefaultTableModel dtm = new DefaultTableModel();
         dtm.addColumn("#");
         dtm.addColumn("Mã Phiếu");
@@ -1811,6 +1837,7 @@ int idOrderOfEm = 0;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jBoxInforProSearched;
+    private javax.swing.JTabbedPane jBoxPays;
     private javax.swing.JPanel jBoxTableEmOfCouter;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -1861,7 +1888,6 @@ int idOrderOfEm = 0;
     private javax.swing.JLabel jNumberTicket;
     private javax.swing.JTextField jNumberUnit;
     private javax.swing.JLabel jOutMoney;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -1872,7 +1898,6 @@ int idOrderOfEm = 0;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
@@ -1889,7 +1914,6 @@ int idOrderOfEm = 0;
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jPricePro;
@@ -1905,7 +1929,9 @@ int idOrderOfEm = 0;
     private javax.swing.JMenuItem jShowDetailOrderByEm;
     private javax.swing.JMenuItem jShowEm;
     private javax.swing.JCheckBox jStatusCouter;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel jTabAllOrders;
+    private javax.swing.JPanel jTabCouters;
+    private javax.swing.JPanel jTabPays;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTableCouters;
     private javax.swing.JTable jTableEmOfCouter;
