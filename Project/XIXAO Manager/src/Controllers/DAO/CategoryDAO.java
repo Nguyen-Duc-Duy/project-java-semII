@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -58,7 +60,7 @@ public class CategoryDAO implements ICategory {
             String SQLcreateCat = "{ call createCat(?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreateCat);
             ps.setString(1, c.getName());
-            ps.executeQuery();
+            int row = ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Thêm Mới thành công !");
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Lỗi hệ thống ! Xin thử lại sau !");
@@ -69,10 +71,11 @@ public class CategoryDAO implements ICategory {
     @Override
     public void updateCat(Categorys c) {
         try {
-            String SQLcreateCat = "{ call updateCat(?,?)}";
+            String SQLcreateCat = "{ call updateCat(?,?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreateCat);
-            ps.setString(1, c.getName());
-            ps.setInt(2, c.getId());
+            ps.setInt(1, c.getId());
+            ps.setString(2, c.getName());
+            ps.setInt(3, c.getStatus());
 
             int row = ps.executeUpdate();
             JOptionPane.showMessageDialog(null, row + " mục đã được Cập Nhật thành công !");
@@ -97,13 +100,7 @@ public class CategoryDAO implements ICategory {
     }
 
     @Override
-    public void printCat() {
-        List<Categorys> listCat = getAll();
-
-    }
-
-    @Override
-    public void changeSTT(int id,int status) {
+    public void changeSTT(int id, int status) {
         try {
             String SQLcreateCat = "{ call changeSTTCat(?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreateCat);
@@ -124,6 +121,27 @@ public class CategoryDAO implements ICategory {
             JOptionPane.showMessageDialog(null, "Lỗi hệ thống ! Xin thử lại sau !");
             System.out.println("lỗi lệnh sql !" + ex.getMessage());
         }
+    }
+
+    @Override
+    public List<Categorys> searchCat(String key) {
+        List<Categorys> listSearch = new ArrayList<>();
+
+        try {
+            String SQLsearchCat = "{ call searchCat(?)}";
+            PreparedStatement ps = con.prepareStatement(SQLsearchCat);
+            ps.setString(1, "%" + key + "%");
+            ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    Categorys c = new Categorys(rs.getInt("id"), rs.getString("name"), rs.getInt("status"), rs.getString("date_created"), rs.getString("date_updated"));
+                    listSearch.add(c);
+                }
+            return listSearch;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return null;
+        }
+
     }
 
 }

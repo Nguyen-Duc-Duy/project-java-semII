@@ -16,26 +16,32 @@ public class Actions {
     String code;
     String date_created;
     String date_updated;
+    int id_view;
 //Hàn khởi tạo
     //có id
-    public Actions(int id, String name, String code, String date_created, String date_updated) {
+
+    public Actions(int id, String name, String code, String date_created, String date_updated, int id_view) {
         this.id = id;
         this.name = name;
         this.code = code;
         this.date_created = date_created;
         this.date_updated = date_updated;
+        this.id_view = id_view;
     }
+    
     //không có id
-    public Actions(String name, String code, String date_created, String date_updated) {
-        this.name = name;
-        this.code = code;
-        this.date_created = date_created;
-        this.date_updated = date_updated;
-    }
     //không có tham số truyền vào
     public Actions() {
     }
+
+    public Actions(int id, String name, int id_view) {
+        this.id = id;
+        this.name = name;
+        this.id_view = id_view;
+    }
+    
 //Phương thức set & get
+
     public int getId() {
         return id;
     }
@@ -75,6 +81,13 @@ public class Actions {
     public void setDate_updated(String date_updated) {
         this.date_updated = date_updated;
     }
-    
+
+    public int getId_view() {
+        return id_view;
+    }
+
+    public void setId_view(int id_view) {
+        this.id_view = id_view;
+    }
     
 }

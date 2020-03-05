@@ -7,7 +7,7 @@ package Controllers.DAO;
 
 import Controllers.Interfaces.IAccount;
 import Emtitys.Employers;
-import Emtitys.UersPers;
+import Emtitys.Views;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,23 +78,23 @@ public class AccountDAO implements IAccount {
         return matcher.find();
     }   
 //    kiểm tra email trên csdl
-    private List checkEmail(String email) {
+    public List checkEmail(String email) {
         List<Employers> listEm = new ArrayList<>();
-        if (rgEmail(email)) {
             try {
                 String SQLcheckeMail = "{ CALL checkEmail(?) }";
                 PreparedStatement ps = connect.prepareStatement(SQLcheckeMail);
                 ps.setString(1, email);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    Employers e = new Employers(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("pass"), rs.getString("avt"), rs.getString("phone"), rs.getInt("status"), rs.getString("date_created"), rs.getString("date_updated"), rs.getInt("id_couter"));
+                    Employers e = new Employers(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("pass"), rs.getString("avt"), rs.getString("phone"), rs.getInt("status"),rs.getInt("id_couter"),rs.getInt("id_per"), rs.getString("date_created"), rs.getString("date_updated"));
                     listEm.add(e);
                 }
+                return listEm;
             } catch (SQLException ex) {
                 System.out.println("Lỗi thực thi sql ! " + ex.getMessage());
                 JOptionPane.showMessageDialog(null, "Lỗi hệ thống, Xin thử lại sau !");
+                return null;
             }
-        }
-        return listEm;
+        
     }
 }

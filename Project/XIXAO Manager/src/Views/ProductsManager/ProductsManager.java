@@ -5,12 +5,23 @@
  */
 package Views.ProductsManager;
 
-import Commons.ConnectData;
+import Controllers.DAO.GroupsPerDAO;
 import Controllers.DAO.ProductDAO;
+import Emtitys.Employers;
 import Emtitys.Products;
+import Views.Employees.EmployeesManager;
+import Views.MethodCommon;
 import Views.ProductsManager.CategorysManager.CategorysManager;
 import Views.ProductsManager.UnitsManager.UnitsManager;
+import com.gembox.spreadsheet.ExcelFile;
+import com.gembox.spreadsheet.ExcelWorksheet;
+import com.gembox.spreadsheet.SpreadsheetInfo;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
+import java.util.List;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,25 +30,107 @@ import javax.swing.JPanel;
  *
  * @author ADMIN
  */
-public class ProductsManager extends javax.swing.JFrame implements ListPro.interactToolbar{
+public class ProductsManager extends javax.swing.JFrame implements ListPro.interactToolbar {
 
     /**
      * Creates new form Employer
      */
-    ConnectData c = new ConnectData();
-    Connection connect = c.Connecting();
-    ProductDAO PD = new ProductDAO(connect);
+    Connection connect;
+    ProductDAO PD;
+    ListPro listPro;
+    GroupsPerDAO GPD;
+    Employers em;
 //    PropertysCommon PPCM = new PropertysCommon(this, , null)
 
-    public ProductsManager() {
+    public ProductsManager(Connection c, Employers em) {
+        this.connect = c;
+        this.em = em;
+        GPD = new GroupsPerDAO(c);
+        PD = new ProductDAO(connect);
+
         initComponents();
+        new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
+
+        RolesView();
+        RolesActions();
 //        set layer mặc định
-        ListPro listPro = new ListPro(connect, this);
+        listPro = new ListPro(connect, this,em);
         setLayerPro(listPro);
-        CategorysManager catForm = new CategorysManager(connect);
+        CategorysManager catForm = new CategorysManager(connect,em);
         setlayerOther(catForm);
         setDefaultToolbar();
+        setDefaultCloseOperation(ProductsManager.DISPOSE_ON_CLOSE);
 
+    }
+//  phân quyền
+
+    private void RolesView() {
+        jBoxPro.remove(jPro);
+        jBoxPro.remove(jCatUnit);
+        jCategorysTool.setVisible(false);
+        jUnitsTool.setVisible(false);
+        if (em.getStatus() == 2) {
+            jBoxPro.addTab("Sản phẩm", jPro);
+            jBoxPro.addTab("Thông tin chung", jCatUnit);
+            jCategorysTool.setVisible(true);
+            jUnitsTool.setVisible(true);
+        } else {
+            List<String> listPAByEm = GPD.listPerActByEm(em.getId());
+
+            for (String PAByEm : listPAByEm) {
+
+                switch (PAByEm) {
+                    case "Pro":
+                        jBoxPro.addTab("Sản phẩm", jPro);
+                        break;
+                    case "Cat":
+                        jBoxPro.addTab("Thông tin chung", jCatUnit);
+                        jCategorysTool.setVisible(true);
+                        break;
+                    case "Unit":
+                        jBoxPro.addTab("Thông tin chung", jCatUnit);
+                        jUnitsTool.setVisible(true);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void RolesActions() {
+        jCreatePro.setVisible(false);
+        jListPro.setVisible(false);
+        jUpdatePro.setVisible(false);
+        jDeletePro.setVisible(false);
+        jPrintPro.setVisible(false);
+        if (em.getStatus() == 2) {
+            jCreatePro.setVisible(true);
+            jListPro.setVisible(true);
+            jUpdatePro.setVisible(true);
+            jDeletePro.setVisible(true);
+            jPrintPro.setVisible(true);
+        } else {
+            List<String> ListActionsByEm = GPD.listActByEm(em.getId());
+            for (String ActionsByEm : ListActionsByEm) {
+                switch (ActionsByEm) {
+                    case "P-1":
+                        jCreatePro.setVisible(true);
+                        break;
+                    case "P-2":
+                        jUpdatePro.setVisible(true);
+                        break;
+                    case "P-3":
+                        jDeletePro.setVisible(true);
+                        break;
+                    case "P-4":
+                        jListPro.setVisible(true);
+                        break;
+                    case "P-5":
+                        jPrintPro.setVisible(true);
+                        break;
+                }
+            }
+        }
+        
     }
 
     /**
@@ -48,7 +141,7 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
     private void setDefaultToolbar() {
         jUpdatePro.setVisible(false);
         jDeletePro.setVisible(false);
-        jStatusPro.setVisible(false);
+//        jStatusPro.setVisible(false);
     }
 
     private void setLayerPro(JPanel panel) {
@@ -64,32 +157,34 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
         jLayeredPane4.repaint();
         jLayeredPane4.revalidate();
     }
-    
+
 //
-    int idProSelected=10;
+    int idProSelected = 10;
+
     @Override
     public void changeToolbar(int id) {
         jUpdatePro.setVisible(true);
         jDeletePro.setVisible(true);
-        jStatusPro.setVisible(true);
+//        jStatusPro.setVisible(true);
         idProSelected = id;
+        RolesActions();
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        jBoxPro = new javax.swing.JTabbedPane();
+        jPro = new javax.swing.JPanel();
         jToolBar2 = new javax.swing.JToolBar();
         jCreatePro = new javax.swing.JButton();
         jListPro = new javax.swing.JButton();
         jUpdatePro = new javax.swing.JButton();
         jDeletePro = new javax.swing.JButton();
-        jStatusPro = new javax.swing.JButton();
         jPrintPro = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
-        jPanel7 = new javax.swing.JPanel();
+        jCatUnit = new javax.swing.JPanel();
         jToolBar4 = new javax.swing.JToolBar();
         jCategorysTool = new javax.swing.JButton();
         jUnitsTool = new javax.swing.JButton();
@@ -154,12 +249,6 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
         });
         jToolBar2.add(jDeletePro);
 
-        jStatusPro.setText("Trạng thái");
-        jStatusPro.setFocusable(false);
-        jStatusPro.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jStatusPro.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar2.add(jStatusPro);
-
         jPrintPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/print-icon.png"))); // NOI18N
         jPrintPro.setText("In");
         jPrintPro.setFocusable(false);
@@ -188,22 +277,22 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
             .addComponent(jLayeredPane1)
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jProLayout = new javax.swing.GroupLayout(jPro);
+        jPro.setLayout(jProLayout);
+        jProLayout.setHorizontalGroup(
+            jProLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        jProLayout.setVerticalGroup(
+            jProLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jProLayout.createSequentialGroup()
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Sản Phẩm", jPanel1);
+        jBoxPro.addTab("Sản Phẩm", jPro);
 
         jToolBar4.setRollover(true);
         jToolBar4.setAutoscrolls(true);
@@ -262,91 +351,144 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
             .addComponent(jLayeredPane4, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jCatUnitLayout = new javax.swing.GroupLayout(jCatUnit);
+        jCatUnit.setLayout(jCatUnitLayout);
+        jCatUnitLayout.setHorizontalGroup(
+            jCatUnitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        jCatUnitLayout.setVerticalGroup(
+            jCatUnitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jCatUnitLayout.createSequentialGroup()
                 .addComponent(jToolBar4, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Thông tin chung", jPanel7);
+        jBoxPro.addTab("Thông tin chung", jCatUnit);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jBoxPro)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jBoxPro)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jListProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jListProActionPerformed
-        ListPro listPro = new ListPro(connect,this);
+        ListPro listPro = new ListPro(connect, this,em);
         setLayerPro(listPro);
+        setDefaultToolbar();
     }//GEN-LAST:event_jListProActionPerformed
 
     private void jCreateProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCreateProActionPerformed
         InforPro createPro = new InforPro(connect);
         setLayerPro(createPro);
-        
+        setDefaultToolbar();
     }//GEN-LAST:event_jCreateProActionPerformed
-
-    private void jDeleteProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteProActionPerformed
+    @Override
+    public void deletePro(int id) {
         int check = JOptionPane.showConfirmDialog(rootPane, "Bạn có chác muốn xóa Sản Phẩm", "Xác nhận hành động", JOptionPane.CANCEL_OPTION, JOptionPane.OK_OPTION);
-        if(check == 0){
-            PD.deletePro(idProSelected);
-        }
+        if (check == 0) {
+            PD.deletePro(id);
+        };
+        setLayerPro(new ListPro(connect, this,em));
+    }
+    private void jDeleteProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteProActionPerformed
+        deletePro(idProSelected);
     }//GEN-LAST:event_jDeleteProActionPerformed
+    public void saveExcel() {
 
-    private void jPrintProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPrintProActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        String choosertitle = "Chọn đường dẫn";
-//        chooser.showOpenDialog()
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle(choosertitle);
+        JFileChooser fileChooser = new JFileChooser();
+        File file = new File("E:/");
+        fileChooser.setSelectedFile(file);
+        fileChooser.showSaveDialog(jPrintPro);
+        String pathNew = String.valueOf(fileChooser.getSelectedFile());
+        try {
+            SpreadsheetInfo.setLicense("FREE-LIMITED-KEY");
+            ExcelFile excel = new ExcelFile();
+            ExcelWorksheet workSheet = excel.addWorksheet("Tables");
+            if (file.exists()) {
+                file.delete();
+                workSheet.getCell(0, 0).setValue("#");
+                workSheet.getCell(0, 1).setValue("Tên");
+                workSheet.getCell(0, 2).setValue("Mã");
+                workSheet.getCell(0, 3).setValue("Danh Mục");
+                workSheet.getCell(0, 4).setValue("Giá");
+                workSheet.getCell(0, 5).setValue("Khuyến Mãi");
+                workSheet.getCell(0, 6).setValue("Mô Tả");
+                workSheet.getCell(0, 7).setValue("Số Lượng");
+                workSheet.getCell(0, 8).setValue("Ảnh");
+                workSheet.getCell(0, 9).setValue("Đơn Vị");
+                workSheet.getCell(0, 10).setValue("Trạng Thái");
+                workSheet.getCell(0, 11).setValue("Ngày Tạo");
+                workSheet.getCell(0, 12).setValue("Ngày Sửa");
+                List<Products> listPros = PD.getAll();
+                excel.save(pathNew);
+                int count = 0;
+                for (int i = 1; i <= listPros.size(); i++) {
+                    count++;
+                    workSheet.getCell(i, 0).setValue(count);
+                    for (int j = 0; j < 6; j++) {
+                        workSheet.getCell(i, 1).setValue(listPros.get(i - 1).getName());
+                        workSheet.getCell(i, 2).setValue(listPros.get(i - 1).getId_cat());
+                        workSheet.getCell(i, 3).setValue(listPros.get(i - 1).getPrice());
+                        workSheet.getCell(i, 4).setValue(listPros.get(i - 1).getSale());
+                        workSheet.getCell(i, 5).setValue(listPros.get(i - 1).getDescript());
+                        workSheet.getCell(i, 6).setValue(listPros.get(i - 1).getQuantity());
+                        workSheet.getCell(i, 7).setValue(listPros.get(i - 1).getImg());
+                        workSheet.getCell(i, 8).setValue(listPros.get(i - 1).getId_unit());
+                        workSheet.getCell(i, 9).setValue(listPros.get(i - 1).getStatus());
+                        workSheet.getCell(i, 10).setValue(listPros.get(i - 1).getDate_crated());
+                        workSheet.getCell(i, 11).setValue(listPros.get(i - 1).getDate_updated());
 
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);
-        //    
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            System.out.println("getCurrentDirectory(): "
-                    + chooser.getCurrentDirectory());
-            System.out.println("getSelectedFile() : "
-                    + chooser.getSelectedFile());
-        } else {
-            JOptionPane.showMessageDialog(rootPane, "Lỗi đường đãn xin thử lại !");
+                    }
+                }
+                excel.save(pathNew);
+            }
+            JOptionPane.showMessageDialog(rootPane, "Lưu file thành công !");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(rootPane, "File không tồn tại ! Xin thử lại !");
+            System.out.println(ex.toString());
         }
+    }
+    private void jPrintProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPrintProActionPerformed
+        setDefaultToolbar();
 
+        saveExcel();
     }//GEN-LAST:event_jPrintProActionPerformed
 
     private void jCategorysToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCategorysToolActionPerformed
-        CategorysManager catForm = new CategorysManager(connect);
+        CategorysManager catForm = new CategorysManager(connect,em);
         setlayerOther(catForm);
     }//GEN-LAST:event_jCategorysToolActionPerformed
 
     private void jUnitsToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUnitsToolActionPerformed
-        UnitsManager unitForm = new UnitsManager(connect);
+        UnitsManager unitForm = new UnitsManager(connect,em);
         setlayerOther(unitForm);
     }//GEN-LAST:event_jUnitsToolActionPerformed
-
-    private void jUpdateProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateProActionPerformed
-        InforPro inforPro = new InforPro(connect,idProSelected);
+    @Override
+    public void changeInforPopup(int id) {
+        InforPro inforPro = new InforPro(connect, idProSelected);
         setLayerPro(inforPro);
-        
+    }
+    private void jUpdateProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateProActionPerformed
+        InforPro inforPro = new InforPro(connect, idProSelected);
+        setLayerPro(inforPro);
+
     }//GEN-LAST:event_jUpdateProActionPerformed
+
+    @Override
+    public void changeSTT(int id, int status) {
+        PD.changeSTT(id, status);
+    }
 
     /**
      * @param args the command line arguments
@@ -378,31 +520,28 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ProductsManager().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTabbedPane jBoxPro;
+    private javax.swing.JPanel jCatUnit;
     private javax.swing.JButton jCategorysTool;
     private javax.swing.JButton jCreatePro;
     private javax.swing.JButton jDeletePro;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JLayeredPane jLayeredPane4;
     private javax.swing.JButton jListPro;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jPrintPro;
-    private javax.swing.JButton jStatusPro;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel jPro;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JToolBar jToolBar4;
     private javax.swing.JButton jUnitsTool;
     private javax.swing.JButton jUpdatePro;
     // End of variables declaration//GEN-END:variables
 
-    
 }

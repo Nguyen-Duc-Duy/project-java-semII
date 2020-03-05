@@ -93,8 +93,11 @@ public class login extends javax.swing.JFrame{
         jbox_login.setLayout(null);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 102, 0));
         jLabel4.setText("Email");
 
+        jEmail.setText("programbuilder@gmail.com");
+        jEmail.setToolTipText("");
         jEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jEmailActionPerformed(evt);
@@ -126,9 +129,10 @@ public class login extends javax.swing.JFrame{
         jPanel2.setBounds(10, 20, 270, 40);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(0, 102, 0));
         jLabel5.setText("Mật khẩu");
 
-        jpassword.setText("jPasswordField1");
+        jpassword.setToolTipText("");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -158,6 +162,7 @@ public class login extends javax.swing.JFrame{
 
         jPanel6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
+        jButtonLogin.setBackground(new java.awt.Color(153, 153, 153));
         jButtonLogin.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonLogin.setText("Đăng nhập");
         jButtonLogin.addActionListener(new java.awt.event.ActionListener() {
@@ -166,6 +171,7 @@ public class login extends javax.swing.JFrame{
             }
         });
 
+        jButtonCancel.setBackground(new java.awt.Color(153, 153, 153));
         jButtonCancel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButtonCancel.setText("Hủy");
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {

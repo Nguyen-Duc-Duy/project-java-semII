@@ -19,4 +19,9 @@ public interface IProduct {
     public void changeSTT(int id, int status);
     public void deletePro(int id);
     public void printPro();
+    public Products selectProById(int id);
+    public void changeQuantityPro(int id,int quantity);
+    public List<Products>  sortToAToZ();
+    public List<Products> listProInDay(String day);
+    public List<Products> listProOfWeek();
 }
