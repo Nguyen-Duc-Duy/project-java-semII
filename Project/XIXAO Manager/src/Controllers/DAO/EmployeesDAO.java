@@ -106,7 +106,7 @@ public class EmployeesDAO implements IEmployees {
     @Override
     public boolean updateEm(Employers e) {
         try {
-            String SQLcreatePro = "{ call createEm(?,?,?,?,?,?,?)}";
+            String SQLcreatePro = "{ call updateEm(?,?,?,?,?,?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreatePro);
             ps.setString(1, e.getName());
             ps.setString(2, e.getEmail());
@@ -119,7 +119,7 @@ public class EmployeesDAO implements IEmployees {
             JOptionPane.showMessageDialog(null, row + " nhân viên đã cập nhật!");
             return true;
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Thêm mới thất bại ! Xin thử lại sau");
+            JOptionPane.showMessageDialog(null, "Cập nhật thất bại ! Xin thử lại sau");
             System.out.println(ex.getMessage());
             return false;
         }

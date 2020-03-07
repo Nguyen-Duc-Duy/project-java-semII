@@ -19,7 +19,10 @@ import com.gembox.spreadsheet.SpreadsheetInfo;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
@@ -435,14 +438,18 @@ public class ProductsManager extends javax.swing.JFrame implements ListPro.inter
                 List<Products> listPros = PD.getAll();
                 excel.save(pathNew);
                 int count = 0;
+                Locale locale = new Locale("vi", "VN");      
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
+                
+
                 for (int i = 1; i <= listPros.size(); i++) {
                     count++;
                     workSheet.getCell(i, 0).setValue(count);
                     for (int j = 0; j < 6; j++) {
                         workSheet.getCell(i, 1).setValue(listPros.get(i - 1).getName());
                         workSheet.getCell(i, 2).setValue(listPros.get(i - 1).getId_cat());
-                        workSheet.getCell(i, 3).setValue(listPros.get(i - 1).getPrice());
-                        workSheet.getCell(i, 4).setValue(listPros.get(i - 1).getSale());
+                        workSheet.getCell(i, 3).setValue(currencyFormatter.format(listPros.get(i - 1).getPrice()));
+                        workSheet.getCell(i, 4).setValue(currencyFormatter.format(listPros.get(i - 1).getSale()));
                         workSheet.getCell(i, 5).setValue(listPros.get(i - 1).getDescript());
                         workSheet.getCell(i, 6).setValue(listPros.get(i - 1).getQuantity());
                         workSheet.getCell(i, 7).setValue(listPros.get(i - 1).getImg());

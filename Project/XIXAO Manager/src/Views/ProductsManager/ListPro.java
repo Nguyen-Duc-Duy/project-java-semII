@@ -14,9 +14,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -108,7 +111,10 @@ public class ListPro extends javax.swing.JPanel {
         dtm.addColumn("Trạng Thái");
         dtm.addColumn("Ngày Tạo");
         dtm.addColumn("Ngày Sửa");
+        Locale locale = new Locale("vi", "VN");      
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
 
+        
         int i = 0;
         String status = "";
         for (Products l : listPro) {
@@ -123,8 +129,8 @@ public class ListPro extends javax.swing.JPanel {
             v.add(l.getName());
             v.add(l.getCode());
             v.add(l.getId_cat());
-            v.add(l.getPrice());
-            v.add(l.getSale());
+            v.add(currencyFormatter.format(l.getPrice()));
+            v.add(currencyFormatter.format(l.getSale()));
             v.add(l.getDescript());
             v.add(l.getQuantity());
             v.add(l.getImg());

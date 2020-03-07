@@ -13,8 +13,11 @@ import Emtitys.Employers;
 import Emtitys.OrderDetails;
 import Emtitys.Orders;
 import Emtitys.Products;
+import Views.MethodCommon;
 import java.sql.Connection;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
@@ -27,14 +30,15 @@ public class OrderDtail extends javax.swing.JFrame {
     /**
      * Creates new form OrderDtail
      */
-        int row = 0;
+    int row = 0;
     Connection con;
     OrdersDAO O;
     OrderDetailDAO OD;
     ProductDAO PD;
     EmployeesDAO ED;
+
     public OrderDtail(int id_order, Connection c) {
-                this.con = c;
+        this.con = c;
         this.row = id_order;
         this.O = new OrdersDAO(c);
         this.PD = new ProductDAO(c);
@@ -42,22 +46,31 @@ public class OrderDtail extends javax.swing.JFrame {
         ED = new EmployeesDAO(c);
         initComponents();
         
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(PaysManager.DISPOSE_ON_CLOSE);
+        new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
+        this.setTitle("Thông tin chi tiết đơn hàng "+O.selectById(id_order).getCode());
+
         addTableOD();
     }
+    Locale locale = new Locale("vi", "VN");
+    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
 //
-    private void showInforOrder(float dis,float total){
+
+    private void showInforOrder(float dis, float total) {
         Orders o = O.selectById(row);
         Employers e = ED.getEmById(o.getId_employee());
         jNameEm.setText(e.getName());
         jNumberTicket1.setText(String.valueOf(o.getCode()));
         jDateOutput1.setText(o.getDate_created());
-        jTotalMoney1.setText(String.valueOf(total));
-        jDiscount1.setText(String.valueOf(dis));
+        jTotalMoney1.setText(String.valueOf(currencyFormatter.format(total)));
+        jDiscount1.setText(String.valueOf(currencyFormatter.format(dis)));
     }
 
     float discount = 0;
     float totalOrder = 0;
 //đẩy giá trị lên bảng chi tiết order
+
     private void addTableOD() {
         DefaultTableModel dtm = new DefaultTableModel();
         dtm.addColumn("#");
@@ -87,16 +100,16 @@ public class OrderDtail extends javax.swing.JFrame {
             v.add(p.getName());
             v.add(p.getDate_crated());
             v.add(listOD1.getQuantity());
-            v.add(p.getPrice());
-            v.add(p.getSale());
-            v.add(discountPro);
-            v.add(moneyPro);
+            v.add(currencyFormatter.format(p.getPrice()));
+            v.add(currencyFormatter.format(p.getSale()));
+            v.add(currencyFormatter.format(discountPro));
+            v.add(currencyFormatter.format(moneyPro));
             dtm.addRow(v);
 //          Tính tổng tiền và tổng chiết khấu
             discount += discountPro;
             totalOrder += moneyPro;
         }
-        showInforOrder(discount,totalOrder);
+        showInforOrder(discount, totalOrder);
         jTableOD.setModel(dtm);
     }
 
@@ -142,6 +155,8 @@ public class OrderDtail extends javax.swing.JFrame {
 
         jLabel25.setText("Số  Phiếu");
 
+        jNumberTicket1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
         javax.swing.GroupLayout jPanel37Layout = new javax.swing.GroupLayout(jPanel37);
         jPanel37.setLayout(jPanel37Layout);
         jPanel37Layout.setHorizontalGroup(
@@ -161,15 +176,17 @@ public class OrderDtail extends javax.swing.JFrame {
 
         jLabel26.setText("Ngày xuất");
 
+        jDateOutput1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
         javax.swing.GroupLayout jPanel38Layout = new javax.swing.GroupLayout(jPanel38);
         jPanel38.setLayout(jPanel38Layout);
         jPanel38Layout.setHorizontalGroup(
             jPanel38Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel38Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
+                .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jDateOutput1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jDateOutput1, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
         );
         jPanel38Layout.setVerticalGroup(
             jPanel38Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,6 +211,8 @@ public class OrderDtail extends javax.swing.JFrame {
         );
 
         jLabel1.setText("Nhân viên");
+
+        jNameEm.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -343,22 +362,21 @@ public class OrderDtail extends javax.swing.JFrame {
         jInforOrder1.setLayout(jInforOrder1Layout);
         jInforOrder1Layout.setHorizontalGroup(
             jInforOrder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jInforOrder1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jInforOrder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addComponent(jPanel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
-            .addComponent(jPanel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jInforOrder1Layout.setVerticalGroup(
             jInforOrder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInforOrder1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jPanel36, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(22, 22, 22)
                 .addComponent(jPanel30, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -367,7 +385,9 @@ public class OrderDtail extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jInforOrder1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jInforOrder1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

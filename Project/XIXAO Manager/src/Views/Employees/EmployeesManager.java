@@ -143,7 +143,7 @@ public class EmployeesManager extends javax.swing.JFrame {
             jPrintListEm.setVisible(true);
             jChangeSTTpopupEm.setVisible(true);
 //          nhóm quyền
-            jBoxActions.setVisible(false);
+            jBoxActions.setVisible(true);
             jCreateGPPopup.setVisible(true);
             jUpdateGPPopup.setVisible(true);
         } else {
@@ -195,7 +195,7 @@ public class EmployeesManager extends javax.swing.JFrame {
 
             p.setPreferredSize(new Dimension(640, 100));
             p.setBounds(100, 100, 100, 100);
-            p.setBackground(Color.red);
+            p.setBackground(Color.gray);
             p.setBorder(new EmptyBorder(5, 5, 5, 5));
             p.setVisible(true);
 
@@ -350,7 +350,10 @@ public class EmployeesManager extends javax.swing.JFrame {
         List<Couters> listCouter = CD.getAll();
         DefaultComboBoxModel dcmCouters = new DefaultComboBoxModel();
         for (Couters Couter : listCouter) {
-            dcmCouters.addElement(Couter.getName());
+            if (Couter.getStatus() == 1) {
+                dcmCouters.addElement(Couter.getName());
+            }
+            
         }
         jCouter.setModel(dcmCouters);
     }

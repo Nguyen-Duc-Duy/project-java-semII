@@ -70,7 +70,10 @@ public class InforPro extends javax.swing.JPanel {
     private void addComboBoxCat() {
         DefaultComboBoxModel dcm = new DefaultComboBoxModel();
         for (Categorys l : listCat) {
-            dcm.addElement(l.getName());
+            if (l.getStatus() == 1) {
+                dcm.addElement(l.getName());
+            }
+            
         }
         jCategorys.setModel(dcm);
     }

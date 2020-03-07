@@ -161,7 +161,9 @@ AS SELECT * FROM employers WHERE email like @email
 select * from actions
 ALTER TABLE actions
 ADD id_view INT FOREIGN KEY REFERENCES [views](id)
-
+-- them khoa cho id_view
+ALTER TABLE actions
+ADD FOREIGN KEY (id_view) REFERENCES views(id);
 --sửa bảng employers
 SELECT * FROM groupsPers
 ALTER TABLE employers
@@ -209,7 +211,8 @@ INSERT INTO actions(name,code,date_created,id_view) VALUES
 (N'Thêm Quầy','C-1',GETDATE(),7),
 (N'Cập Nhật','C-2',GETDATE(),7),
 (N'Xem Danh sách quầy','C-3',GETDATE(),7),
-(N'Xem nhân viên theo quầy','C-4',GETDATE(),7)
+(N'Xem nhân viên theo quầy','C-4',GETDATE(),7),
+(N'Thay đổi trạng thái','C-5',GETDATE(),7)
 -- thêm giá trị cho action unit - đơn vị
 INSERT INTO actions(name,code,date_created,id_view) VALUES
 (N'Thêm Mới','U-1',GETDATE(),5),
@@ -390,14 +393,14 @@ CREATE PROC createOrder
 @id_em INT,@code int
 AS
 INSERT INTO orders(id_employee,code,date_created) VALUES (@id_em,@code,GETDATE()) 
-	--THỬ
-	EXEC createOrder 1,111111112
+
 	-- xóa
 CREATE PROC deleteOrder
 @id int
 as
 delete from orderDetail where id_order = @id
 delete from orders where id = @id
+
 	-- lấy order theo id
 create proc selectOrderById
 @id int
@@ -628,8 +631,6 @@ on v.id = a.id_view
 (select gp.id from groupsPers gp where id =
 (select e.id_per from employers e where id = @id_e))
 group by v.code
-
-exec selectPerActByEm 1
 
 
 --lấy mã actions theo id nhân viên

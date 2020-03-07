@@ -8,18 +8,24 @@ package Views;
 import Commons.ConnectData;
 import Controllers.DAO.GroupsPerDAO;
 import Emtitys.Employers;
+import Views.Account.InforAcc;
 import Views.Employees.EmployeesManager;
 import Views.PayManger.PaysManager;
 import Views.ProductsManager.ProductsManager;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.Timer;
+import jdk.nashorn.internal.runtime.ListAdapter;
 
 /**
  *
@@ -37,14 +43,13 @@ public class Manager extends javax.swing.JFrame {
 
     public Manager(Emtitys.Employers e) {
         setTime();
-        
-        initComponents();
-        setTitle("Phần mềm quản lý siêu thị (" + "Tên nhân viên" + ")");
-        
+        initComponents();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+        setTitle("Phần mềm quản lý siêu thị (" + e.getName() + ")");
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
 // nhận tài khoản khi đăng nhập
         this.em = e;
         this.GPD = new GroupsPerDAO(c);
-        
+
         MethodCommon c = new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
         showAcc();
@@ -52,7 +57,7 @@ public class Manager extends javax.swing.JFrame {
         defaultRoles();
 //        
         roles();
-        
+
     }
 //  sét thời gian
 
@@ -68,30 +73,33 @@ public class Manager extends javax.swing.JFrame {
                 if (now.get(Calendar.DAY_OF_WEEK) == 1) {
                     dayOfWeek.setText("CN");
                 } else {
-                    dayOfWeek.setText("Thứ "+String.valueOf(now.get(Calendar.DAY_OF_WEEK)));
+                    dayOfWeek.setText("Thứ " + String.valueOf(now.get(Calendar.DAY_OF_WEEK)));
                 }
-                
+
                 time.setText(timeFormat.format(now.getTime()));
                 date.setText(dateFormat.format(now.getTime()));
             }
         }).start();
 
-       
     }
 // phương thức hiển thị thông tin tài khoản
+
     private void showAcc() {
         jAccName.setText(em.getName());
     }
 //  phân quyền
     // mặc định
-    private void defaultRoles(){
+
+    private void defaultRoles() {
         jProduct.setVisible(false);
         jEmployer.setVisible(false);
         jPay.setVisible(false);
-        
+
     }
+
     // phân
-    private void roles(){
+
+    private void roles() {
         List<String> listPAByEm = GPD.listPerActByEm(em.getId());
         for (String listPAByEm1 : listPAByEm) {
             System.out.println(listPAByEm1);
@@ -101,7 +109,7 @@ public class Manager extends javax.swing.JFrame {
             jEmployer.setVisible(true);
             jPay.setVisible(true);
         } else {
-             if (listPAByEm.contains("Pro") || listPAByEm.contains("Cat") || listPAByEm.contains("Unit")) {
+            if (listPAByEm.contains("Pro") || listPAByEm.contains("Cat") || listPAByEm.contains("Unit")) {
                 jProduct.setVisible(true);
             }
             if (listPAByEm.contains("Em") || listPAByEm.contains("Per")) {
@@ -111,8 +119,7 @@ public class Manager extends javax.swing.JFrame {
                 jPay.setVisible(true);
             }
         }
-       
-        
+
     }
 
     /**
@@ -124,6 +131,9 @@ public class Manager extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jInteractAcc = new javax.swing.JPopupMenu();
+        jInforEm = new javax.swing.JMenuItem();
+        jLogout = new javax.swing.JMenuItem();
         jBoxHeader = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         time = new javax.swing.JLabel();
@@ -133,7 +143,7 @@ public class Manager extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jAccName = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
+        jAcc = new javax.swing.JLabel();
         jBoxController = new javax.swing.JPanel();
         jProduct = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -144,6 +154,24 @@ public class Manager extends javax.swing.JFrame {
         jPay = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
+
+        jInforEm.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Male-user-info-icon.png"))); // NOI18N
+        jInforEm.setText("Chỉnh sửa tài khoản");
+        jInforEm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jInforEmActionPerformed(evt);
+            }
+        });
+        jInteractAcc.add(jInforEm);
+
+        jLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Logout-icon.png"))); // NOI18N
+        jLogout.setText("Đăng xuất");
+        jLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLogoutActionPerformed(evt);
+            }
+        });
+        jInteractAcc.add(jLogout);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -219,9 +247,14 @@ public class Manager extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(0, 102, 0));
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Tài khoản");
+        jAcc.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jAcc.setForeground(new java.awt.Color(255, 255, 255));
+        jAcc.setText("Tài khoản");
+        jAcc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jAccMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -229,13 +262,13 @@ public class Manager extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
+                .addComponent(jAcc, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5)
+                .addComponent(jAcc)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -414,9 +447,9 @@ public class Manager extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    ProductsManager PM;
     private void jProductMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMousePressed
-        ProductsManager PM = new ProductsManager(c,em);
+        PM = new ProductsManager(c, em);
         PM.setVisible(true);
     }//GEN-LAST:event_jProductMousePressed
 
@@ -431,16 +464,38 @@ public class Manager extends javax.swing.JFrame {
     private void jPayMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseMoved
         jPay.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jPayMouseMoved
-
+    PaysManager PMs;
     private void jPayMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseClicked
-        PaysManager PM = new PaysManager(c, em);
-        PM.setVisible(true);
+        PMs = new PaysManager(c, em);
+        PMs.setVisible(true);
     }//GEN-LAST:event_jPayMouseClicked
-
+    EmployeesManager EM;
     private void jEmployerMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmployerMousePressed
-        EmployeesManager EM = new EmployeesManager(c,em);
+        EM = new EmployeesManager(c, em);
         EM.setVisible(true);
     }//GEN-LAST:event_jEmployerMousePressed
+//   chức năng liên quan đến tài khoản
+
+    private void jAccMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAccMouseClicked
+        jAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                jInteractAcc.show(e.getComponent(), e.getX(), e.getY());
+            }
+
+        });
+    }//GEN-LAST:event_jAccMouseClicked
+
+    private void jInforEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jInforEmActionPerformed
+        new InforAcc(c, em).setVisible(true);
+        
+    }//GEN-LAST:event_jInforEmActionPerformed
+
+    private void jLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLogoutActionPerformed
+        this.dispose();
+        new login().setVisible(true);
+
+    }//GEN-LAST:event_jLogoutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -482,17 +537,20 @@ public class Manager extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel date;
     private javax.swing.JLabel dayOfWeek;
+    private javax.swing.JLabel jAcc;
     private javax.swing.JLabel jAccName;
     private javax.swing.JPanel jBoxController;
     private javax.swing.JPanel jBoxHeader;
     private javax.swing.JPanel jEmployer;
+    private javax.swing.JMenuItem jInforEm;
+    private javax.swing.JPopupMenu jInteractAcc;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuItem jLogout;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
