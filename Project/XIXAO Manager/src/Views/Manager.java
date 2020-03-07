@@ -6,8 +6,26 @@
 package Views;
 
 import Commons.ConnectData;
+import Controllers.DAO.GroupsPerDAO;
+import Emtitys.Employers;
+import Views.Account.InforAcc;
+import Views.Employees.EmployeesManager;
+import Views.PayManger.PaysManager;
+import Views.ProductsManager.ProductsManager;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import javax.swing.Timer;
+import jdk.nashorn.internal.runtime.ListAdapter;
 
 /**
  *
@@ -19,23 +37,89 @@ public class Manager extends javax.swing.JFrame {
      * Creates new form Manager
      */
     ConnectData connect = new ConnectData();
-    Connection c;
+    Connection c = connect.Connecting();
     Emtitys.Employers em;
+    GroupsPerDAO GPD;
 
     public Manager(Emtitys.Employers e) {
-        initComponents();
+        setTime();
+        initComponents();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+        setTitle("Phần mềm quản lý siêu thị (" + e.getName() + ")");
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
 // nhận tài khoản khi đăng nhập
         this.em = e;
-        PropertysCommon c = new PropertysCommon(getClass(), this, "icon-logo-X-green16.png");
+        this.GPD = new GroupsPerDAO(c);
+
+        MethodCommon c = new MethodCommon(getClass(), this, "icon-logo-X-green16.png");
         setLocationRelativeTo(null);
-        connect.ConnectData();
         showAcc();
+//        
+        defaultRoles();
+//        
+        roles();
+
+    }
+//  sét thời gian
+
+    private void setTime() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyy");
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        int interval = 1000; // 1000 ms
+
+        new Timer(interval, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Calendar now = Calendar.getInstance();
+                if (now.get(Calendar.DAY_OF_WEEK) == 1) {
+                    dayOfWeek.setText("CN");
+                } else {
+                    dayOfWeek.setText("Thứ " + String.valueOf(now.get(Calendar.DAY_OF_WEEK)));
+                }
+
+                time.setText(timeFormat.format(now.getTime()));
+                date.setText(dateFormat.format(now.getTime()));
+            }
+        }).start();
 
     }
 // phương thức hiển thị thông tin tài khoản
 
     private void showAcc() {
         jAccName.setText(em.getName());
+    }
+//  phân quyền
+    // mặc định
+
+    private void defaultRoles() {
+        jProduct.setVisible(false);
+        jEmployer.setVisible(false);
+        jPay.setVisible(false);
+
+    }
+
+    // phân
+
+    private void roles() {
+        List<String> listPAByEm = GPD.listPerActByEm(em.getId());
+        for (String listPAByEm1 : listPAByEm) {
+            System.out.println(listPAByEm1);
+        }
+        if (em.getStatus() == 2) {
+            jProduct.setVisible(true);
+            jEmployer.setVisible(true);
+            jPay.setVisible(true);
+        } else {
+            if (listPAByEm.contains("Pro") || listPAByEm.contains("Cat") || listPAByEm.contains("Unit")) {
+                jProduct.setVisible(true);
+            }
+            if (listPAByEm.contains("Em") || listPAByEm.contains("Per")) {
+                jEmployer.setVisible(true);
+            }
+            if (listPAByEm.contains("Pay") || listPAByEm.contains("Order") || listPAByEm.contains("Couter")) {
+                jPay.setVisible(true);
+            }
+        }
+
     }
 
     /**
@@ -47,35 +131,47 @@ public class Manager extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jInteractAcc = new javax.swing.JPopupMenu();
+        jInforEm = new javax.swing.JMenuItem();
+        jLogout = new javax.swing.JMenuItem();
         jBoxHeader = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        time = new javax.swing.JLabel();
+        date = new javax.swing.JLabel();
+        dayOfWeek = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jAccName = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
+        jAcc = new javax.swing.JLabel();
         jBoxController = new javax.swing.JPanel();
         jProduct = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jRepository = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         jEmployer = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jDashboard = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
         jPay = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
-        jFeedback = new javax.swing.JPanel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
+
+        jInforEm.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Male-user-info-icon.png"))); // NOI18N
+        jInforEm.setText("Chỉnh sửa tài khoản");
+        jInforEm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jInforEmActionPerformed(evt);
+            }
+        });
+        jInteractAcc.add(jInforEm);
+
+        jLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/Logout-icon.png"))); // NOI18N
+        jLogout.setText("Đăng xuất");
+        jLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLogoutActionPerformed(evt);
+            }
+        });
+        jInteractAcc.add(jLogout);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,22 +180,23 @@ public class Manager extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 102, 0));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("10:00");
-        jLabel1.setToolTipText("");
-        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        time.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        time.setForeground(new java.awt.Color(255, 255, 255));
+        time.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        time.setText("10:00");
+        time.setToolTipText("");
+        time.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("10/10/2000");
-        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        date.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        date.setForeground(new java.awt.Color(255, 255, 255));
+        date.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        date.setText("10/10/2000");
+        date.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("Thứ 2");
-        jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        dayOfWeek.setForeground(new java.awt.Color(255, 255, 255));
+        dayOfWeek.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        dayOfWeek.setText("Thứ 2");
+        dayOfWeek.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -107,19 +204,20 @@ public class Manager extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(time, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(date, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dayOfWeek, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(time, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(date, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(dayOfWeek, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jPanel2.setBackground(new java.awt.Color(0, 102, 0));
@@ -137,7 +235,7 @@ public class Manager extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jAccName, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
+                .addComponent(jAccName, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,9 +247,14 @@ public class Manager extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(0, 102, 0));
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Tài khoản");
+        jAcc.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jAcc.setForeground(new java.awt.Color(255, 255, 255));
+        jAcc.setText("Tài khoản");
+        jAcc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jAccMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -159,13 +262,13 @@ public class Manager extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
+                .addComponent(jAcc, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5)
+                .addComponent(jAcc)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -193,7 +296,7 @@ public class Manager extends javax.swing.JFrame {
             .addGroup(jBoxHeaderLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jBoxHeaderLayout.setVerticalGroup(
@@ -203,6 +306,7 @@ public class Manager extends javax.swing.JFrame {
         );
 
         jBoxController.setBackground(new java.awt.Color(255, 255, 255));
+        jBoxController.setToolTipText("ok");
 
         jProduct.setBackground(new java.awt.Color(63, 175, 100));
         jProduct.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -245,51 +349,15 @@ public class Manager extends javax.swing.JFrame {
 
         jBoxController.add(jProduct);
 
-        jRepository.setBackground(new java.awt.Color(255, 102, 102));
-        jRepository.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jRepositoryMouseMoved(evt);
-            }
-        });
-        jRepository.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jRepositoryMouseClicked(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("Nhập kho");
-        jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/inside-2-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jRepositoryLayout = new javax.swing.GroupLayout(jRepository);
-        jRepository.setLayout(jRepositoryLayout);
-        jRepositoryLayout.setHorizontalGroup(
-            jRepositoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jRepositoryLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jRepositoryLayout.setVerticalGroup(
-            jRepositoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jRepositoryLayout.createSequentialGroup()
-                .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jRepository);
-
-        jEmployer.setBackground(new java.awt.Color(255, 153, 51));
+        jEmployer.setBackground(new java.awt.Color(255, 204, 0));
         jEmployer.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 jEmployerMouseMoved(evt);
+            }
+        });
+        jEmployer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jEmployerMousePressed(evt);
             }
         });
 
@@ -322,46 +390,15 @@ public class Manager extends javax.swing.JFrame {
 
         jBoxController.add(jEmployer);
 
-        jDashboard.setBackground(new java.awt.Color(234, 234, 88));
-        jDashboard.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jDashboardMouseMoved(evt);
-            }
-        });
-
-        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel12.setText("Thống kê");
-        jLabel12.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/stats-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jDashboardLayout = new javax.swing.GroupLayout(jDashboard);
-        jDashboard.setLayout(jDashboardLayout);
-        jDashboardLayout.setHorizontalGroup(
-            jDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDashboardLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jDashboardLayout.setVerticalGroup(
-            jDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDashboardLayout.createSequentialGroup()
-                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jDashboard);
-
         jPay.setBackground(new java.awt.Color(204, 102, 255));
         jPay.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 jPayMouseMoved(evt);
+            }
+        });
+        jPay.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPayMouseClicked(evt);
             }
         });
 
@@ -393,42 +430,6 @@ public class Manager extends javax.swing.JFrame {
 
         jBoxController.add(jPay);
 
-        jFeedback.setBackground(new java.awt.Color(0, 153, 153));
-        jFeedback.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jFeedbackMouseMoved(evt);
-            }
-        });
-
-        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("Phản hồi");
-        jLabel16.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Commons/img/mail-icon.png"))); // NOI18N
-
-        javax.swing.GroupLayout jFeedbackLayout = new javax.swing.GroupLayout(jFeedback);
-        jFeedback.setLayout(jFeedbackLayout);
-        jFeedbackLayout.setHorizontalGroup(
-            jFeedbackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jFeedbackLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jFeedbackLayout.setVerticalGroup(
-            jFeedbackLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jFeedbackLayout.createSequentialGroup()
-                .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jBoxController.add(jFeedback);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -446,38 +447,55 @@ public class Manager extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    ProductsManager PM;
     private void jProductMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMousePressed
-
+        PM = new ProductsManager(c, em);
+        PM.setVisible(true);
     }//GEN-LAST:event_jProductMousePressed
 
     private void jProductMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jProductMouseMoved
         jProduct.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jProductMouseMoved
 
-    private void jRepositoryMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseMoved
-        jRepository.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jRepositoryMouseMoved
-
     private void jEmployerMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmployerMouseMoved
         jEmployer.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jEmployerMouseMoved
 
-    private void jDashboardMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jDashboardMouseMoved
-        jDashboard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jDashboardMouseMoved
-
     private void jPayMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseMoved
         jPay.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jPayMouseMoved
+    PaysManager PMs;
+    private void jPayMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPayMouseClicked
+        PMs = new PaysManager(c, em);
+        PMs.setVisible(true);
+    }//GEN-LAST:event_jPayMouseClicked
+    EmployeesManager EM;
+    private void jEmployerMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEmployerMousePressed
+        EM = new EmployeesManager(c, em);
+        EM.setVisible(true);
+    }//GEN-LAST:event_jEmployerMousePressed
+//   chức năng liên quan đến tài khoản
 
-    private void jFeedbackMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFeedbackMouseMoved
-        jFeedback.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jFeedbackMouseMoved
+    private void jAccMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAccMouseClicked
+        jAcc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                jInteractAcc.show(e.getComponent(), e.getX(), e.getY());
+            }
 
-    private void jRepositoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRepositoryMouseClicked
-        jProduct.setVisible(true);
-    }//GEN-LAST:event_jRepositoryMouseClicked
+        });
+    }//GEN-LAST:event_jAccMouseClicked
+
+    private void jInforEmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jInforEmActionPerformed
+        new InforAcc(c, em).setVisible(true);
+        
+    }//GEN-LAST:event_jInforEmActionPerformed
+
+    private void jLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLogoutActionPerformed
+        this.dispose();
+        new login().setVisible(true);
+
+    }//GEN-LAST:event_jLogoutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -507,42 +525,38 @@ public class Manager extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//               
-//            }
-//        });
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                Employers e = new Employers();
+                e.setId(1);
+                new Manager(e).setVisible(true);
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel date;
+    private javax.swing.JLabel dayOfWeek;
+    private javax.swing.JLabel jAcc;
     private javax.swing.JLabel jAccName;
     private javax.swing.JPanel jBoxController;
     private javax.swing.JPanel jBoxHeader;
-    private javax.swing.JPanel jDashboard;
     private javax.swing.JPanel jEmployer;
-    private javax.swing.JPanel jFeedback;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
+    private javax.swing.JMenuItem jInforEm;
+    private javax.swing.JPopupMenu jInteractAcc;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuItem jLogout;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPay;
     private javax.swing.JPanel jProduct;
-    private javax.swing.JPanel jRepository;
+    private javax.swing.JLabel time;
     // End of variables declaration//GEN-END:variables
 }

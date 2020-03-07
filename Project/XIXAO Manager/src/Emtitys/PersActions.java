@@ -23,6 +23,12 @@ public class PersActions {
         this.date_created = date_created;
         this.date_updated = date_updated;
     }
+
+    public PersActions(int id_per, int id_act) {
+        this.id_per = id_per;
+        this.id_act = id_act;
+    }
+    
     //không có tham số
     public PersActions() {
     }

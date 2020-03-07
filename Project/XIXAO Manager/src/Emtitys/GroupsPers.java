@@ -15,13 +15,16 @@ public class GroupsPers {
     String name;
     String date_created;
     String date_updated;
+    int status;
 //Hàn tạo
     //có id
-    public GroupsPers(int id, String name, String date_created, String date_updated) {
+    public GroupsPers(int id, String name, String date_created, String date_updated,int status) {
         this.id = id;
         this.name = name;
         this.date_created = date_created;
         this.date_updated = date_updated;
+        this.status = status;
+        
     }
     //không có id
     public GroupsPers(String name, String date_created, String date_updated) {
@@ -29,9 +32,23 @@ public class GroupsPers {
         this.date_created = date_created;
         this.date_updated = date_updated;
     }
+
+    public GroupsPers(int id, String name, String date_updated, int status) {
+        this.id = id;
+        this.name = name;
+        this.date_updated = date_updated;
+        this.status = status;
+    }
+    
     //không có tham số
     public GroupsPers() {
     }
+
+    public GroupsPers(String name,int status) {
+        this.name = name;
+        this.status = status;
+    }
+    
 //phương thức set & get
 
     public int getId() {
@@ -65,6 +82,15 @@ public class GroupsPers {
     public void setDate_updated(String date_updated) {
         this.date_updated = date_updated;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
     
     
 

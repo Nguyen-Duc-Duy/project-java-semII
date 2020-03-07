@@ -19,11 +19,12 @@ public class Employers {
     String phone;
     int status;
     int id_couter;
+    int id_per;
     String date_created;
     String date_updated;
 //Hàm khởi tạo
     //  có id
-    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated,int id_couter) {
+    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, int id_couter, int id_per, String date_created, String date_updated) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -31,22 +32,45 @@ public class Employers {
         this.avt = avt;
         this.phone = phone;
         this.status = status;
+        this.id_couter = id_couter;
+        this.id_per = id_per;
         this.date_created = date_created;
         this.date_updated = date_updated;
-        this.id_couter = id_couter;
     }
-    //  không có id
-    public Employers(String name, String email, String pass, String avt, String phone, int status, String date_created, String date_updated,int id_couter) {
+   
+    //  không có id,có ngày tạo
+    public Employers(String name, String email, String pass, String avt, String phone, int id_couter, int id_per, String date_created) {    
+        this.name = name;
+        this.email = email;
+        this.pass = pass;
+        this.avt = avt;
+        this.phone = phone;
+        this.id_couter = id_couter;
+        this.id_per = id_per;
+        this.date_created = date_created;
+    }
+
+    // có ngày cập nhật
+
+    public Employers(int id, String name, String email, String pass, String avt, String phone, int status, int id_couter, int id_per, String date_updated) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.pass = pass;
         this.avt = avt;
         this.phone = phone;
         this.status = status;
-        this.date_created = date_created;
-        this.date_updated = date_updated;
         this.id_couter = id_couter;
+        this.id_per = id_per;
+        this.date_updated = date_updated;
     }
+    
+
+    public Employers(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
     //  không có tham số
     public Employers() {
     }
@@ -131,5 +155,14 @@ public class Employers {
     public void setDate_updated(String date_updated) {
         this.date_updated = date_updated;
     }
+
+    public int getId_per() {
+        return id_per;
+    }
+
+    public void setId_per(int id_per) {
+        this.id_per = id_per;
+    }
+    
     
 }
