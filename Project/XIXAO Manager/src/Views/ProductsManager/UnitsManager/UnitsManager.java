@@ -346,6 +346,8 @@ public class UnitsManager extends javax.swing.JPanel {
     }//GEN-LAST:event_jListUnitsMouseClicked
 
     private void jPUCreateUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPUCreateUnitActionPerformed
+        jAddUnit.setVisible(true);
+        jUpdateUnit.setVisible(false);
         jBoxUnit.setVisible(true);
         jNameU.setText("");
         jNameU.requestFocus(true);
