@@ -62,9 +62,24 @@ public class EmployeesDAO implements IEmployees {
         }
         return listEm;
     }
-
     @Override
-    public void createEm(Employers e) {
+    public List<Employers> getEm() {
+        List<Employers> listEm = new ArrayList<>();
+        try {
+            String SQLselectAll = "{ CALL  selectEm }";
+            PreparedStatement ps = con.prepareStatement(SQLselectAll);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Employers e = new Employers(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("pass"), rs.getString("avt"), rs.getString("phone"), rs.getInt("status"), rs.getInt("id_couter"), rs.getInt("id_per"), rs.getString("date_created"), rs.getString("date_updated"));
+                listEm.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return listEm;
+    }
+    @Override
+    public boolean createEm(Employers e) {
         try {
             String SQLcreatePro = "{ call createEm(?,?,?,?,?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreatePro);
@@ -72,21 +87,26 @@ public class EmployeesDAO implements IEmployees {
             ps.setString(2, e.getEmail());
             ps.setString(3, e.getPass());
             ps.setString(4, e.getPhone());
-            ps.setInt(5, e.getId_couter());
+            if (e.getId_couter() == 0) {
+                 ps.setString(5, null);
+            } else {
+                 ps.setInt(5, e.getId_couter());
+            }
             ps.setInt(6, e.getId_per());
             int row = ps.executeUpdate();
             JOptionPane.showMessageDialog(null, row + " nhân viên đã được thêm !");
-
+            return true;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Thêm mới thất bại ! Xin thử lại sau");
             System.out.println(ex.getMessage());
+            return false;
         }
     }
 
     @Override
-    public void updateEm(Employers e) {
+    public boolean updateEm(Employers e) {
         try {
-            String SQLcreatePro = "{ call createEm(?,?,?,?,?,?,?)}";
+            String SQLcreatePro = "{ call updateEm(?,?,?,?,?,?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLcreatePro);
             ps.setString(1, e.getName());
             ps.setString(2, e.getEmail());
@@ -97,15 +117,16 @@ public class EmployeesDAO implements IEmployees {
             ps.setInt(7, e.getId());
             int row = ps.executeUpdate();
             JOptionPane.showMessageDialog(null, row + " nhân viên đã cập nhật!");
-
+            return true;
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Thêm mới thất bại ! Xin thử lại sau");
+            JOptionPane.showMessageDialog(null, "Cập nhật thất bại ! Xin thử lại sau");
             System.out.println(ex.getMessage());
+            return false;
         }
     }
 
     @Override
-    public void changeSTT(int id, int status) {
+    public boolean changeSTT(int id, int status) {
         try {
             String SQLdeletePro = "{ call changeSTTEm(?,?)}";
             PreparedStatement ps = con.prepareStatement(SQLdeletePro);
@@ -113,24 +134,26 @@ public class EmployeesDAO implements IEmployees {
             String message = "";
             if (status == 1) {
                 change = 0;
-                message = " Nhân viên đã mất quyền sử dụng phần mềm!";
+                message = " Nhân viên đã mất quyền sử dụng phần mềm !";
             } else {
                 change = 1;
-                message = " Nhân viên có thể dụng phần mềm!";
+                message = " Nhân viên có thể dụng phần mềm !";
             }
             ps.setInt(1, id);
             ps.setInt(2, change);
             int row = ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, row + message);
+            JOptionPane.showMessageDialog(null,message);
+            return true;
         } catch (SQLException ex) {
             JOptionPane.showConfirmDialog(null, "Thay đổi thất bại Xin thử lại sau !");
             System.out.println("Lỗi csdl !" + ex.getMessage());
+            return false;
         }
         
     }
 
     @Override
-    public void deleteEm(int id) {
+    public boolean deleteEm(int id) {
          try {
             String SQLdeletePro = "{ call deleteEm(?)}";
             PreparedStatement ps = con.prepareStatement(SQLdeletePro);
@@ -139,10 +162,52 @@ public class EmployeesDAO implements IEmployees {
             System.out.println(id);
             int row = ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Xóa thành công !");
+            return true;
         } catch (SQLException ex) {
             JOptionPane.showConfirmDialog(null, "Xóa nhân viên thất bại Xin thử lại sau !");
             System.out.println("Lỗi csdl !" + ex.getMessage());
+            return false;
         }
     }
+
+    @Override
+    public List<Employers> listEmInNewDate() {
+        List<Employers> listEm = new ArrayList<>();
+        try {
+            String SQLselectAll = "{ CALL  selectEmInNewDate }";
+            PreparedStatement ps = con.prepareStatement(SQLselectAll);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Employers e = new Employers(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("pass"), rs.getString("avt"), rs.getString("phone"), rs.getInt("status"), rs.getInt("id_couter"), rs.getInt("id_per"), rs.getString("date_created"), rs.getString("date_updated"));
+                listEm.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi hệ thống. Xin thử lại sau !");
+        }
+        return listEm;
+    }
+
+    @Override
+    public List<Employers> listEmByGP(int id_per) {
+        List<Employers> listEm = new ArrayList<>();
+         try {
+            String SQLselectEmById = "{ call selectEmByGP(?)}";
+            PreparedStatement ps = con.prepareStatement(SQLselectEmById);
+            ps.setInt(1, id_per);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Employers e = new Employers(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("pass"), rs.getString("avt"), rs.getString("phone"), rs.getInt("status"), rs.getInt("id_couter"), rs.getInt("id_per"), rs.getString("date_created"), rs.getString("date_updated"));
+                listEm.add(e);
+            }
+            return listEm;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + " select em by id_per");
+            JOptionPane.showMessageDialog(null, "Lỗi hệ thống. Xin thử lại sau !");
+            return null;
+        }
+    }
+
+
 
 }
